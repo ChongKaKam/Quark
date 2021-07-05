@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="目录  安装 Git 设置 Git 开始使用 Git 远程仓库使用 服务器&#x2F;本机搭建 Git Ubuntu 使用 ssh 远程连接电脑">
+<meta property="og:type" content="article">
+<meta property="og:title" content="How to Use Git and SSH">
+<meta property="og:url" content="http://example.com/2021/04/14/How-to-use-git-ssh/index.html">
+<meta property="og:site_name" content="Qurak">
+<meta property="og:description" content="目录  安装 Git 设置 Git 开始使用 Git 远程仓库使用 服务器&#x2F;本机搭建 Git Ubuntu 使用 ssh 远程连接电脑">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-04-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-04-26T02:50:59.001Z">
+<meta property="article:author" content="Chris">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Git">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2021/04/14/How-to-use-git-ssh/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>How to Use Git and SSH | Qurak</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Qurak</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Make Code Talk</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/04/14/How-to-use-git-ssh/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Chris">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qurak">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          How to Use Git and SSH
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-04-14 00:00:00" itemprop="dateCreated datePublished" datetime="2021-04-14T00:00:00+08:00">2021-04-14</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-04-26 10:50:59" itemprop="dateModified" datetime="2021-04-26T10:50:59+08:00">2021-04-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%A8%8B%E5%BA%8F%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">程序开发</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="目录"><a class="markdownIt-Anchor" href="#目录"></a> 目录</h2>
+<ul>
+<li>安装 Git</li>
+<li>设置 Git</li>
+<li>开始使用 Git</li>
+<li>远程仓库使用</li>
+<li>服务器/本机搭建 Git</li>
+<li>Ubuntu 使用 ssh 远程连接电脑</li>
+</ul>
+<span id="more"></span>
+<h2 id="一-安装-git"><a class="markdownIt-Anchor" href="#一-安装-git"></a> 一、安装 Git</h2>
+<ul>
+<li>
+<p>MacOS：下载 Xcode 时会附带下载 git</p>
+</li>
+<li>
+<p>Ubuntu：使用命令行进行下载</p>
+  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> Maybe you need update before you install</span></span><br><span class="line">sudo apt update</span><br><span class="line"><span class="meta">#</span><span class="bash"> If there are some problems during your update</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> you can check your sources.list and replace a new mirrows <span class="built_in">source</span></span></span><br><span class="line">sudo apt install git</span><br><span class="line"><span class="meta">#</span><span class="bash"> you can check <span class="keyword">if</span> the installation is success</span></span><br><span class="line">git --version</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="二-设置你的-git"><a class="markdownIt-Anchor" href="#二-设置你的-git"></a> 二、设置你的 Git</h2>
+<p>在团队合作中，我们每一次提交（git commit）都应该记录有作者的信息（姓名、电邮等）因此我们需要先设定一下自己的姓名和电邮。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name &quot;MyName&quot;</span><br><span class="line">git config --gloabl user.email &quot;my@email.net&quot;</span><br></pre></td></tr></table></figure>
+<p><code>global</code>：表示全局设定。添加后我们可以使用命令行查看我们设定的内容：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --list</span><br></pre></td></tr></table></figure>
+<p>这些配置信息都可以在 Git 的隐藏文档中查看</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> we can use editor to open this config file</span></span><br><span class="line">cat ~/.gitconfig</span><br></pre></td></tr></table></figure>
+<p><strong>一些冷知识</strong>：</p>
+<ul>
+<li>
+<p>Git 支持利用 alias 功能代替复杂的命令</p>
+  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global alias.st status</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>有时候我们希望 Git 去忽略空白的变化，这个时候你需要在你的设置中加入</p>
+  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global apply.whitespace nowarm</span><br></pre></td></tr></table></figure>
+<p>PS：具体还没操作过，这个暂时忽略吧 😄</p>
+</li>
+<li>
+<p>Git 预设输出时没有颜色的，我们可以让它输出的时候加上颜色帮助我们阅读。</p>
+  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git config --global color.ui true</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="三-开始使用-git"><a class="markdownIt-Anchor" href="#三-开始使用-git"></a> 三、开始使用 Git</h2>
+<h4 id="1-建立仓库"><a class="markdownIt-Anchor" href="#1-建立仓库"></a> 1、建立仓库</h4>
+<p>Git 作为一个分布式管理代码的方案，我们需要在本地建立一个仓库（Repository），这个仓库是负责存放我们的代码。作为一个用户，我们可以自己新建一个仓库或者复制别人的仓库。</p>
+<ul>
+<li>
+<p>自己新建一个新的仓库</p>
+<p>新建一个仓库前，你需要定义一个文件夹来作为仓库。使用 git 命令进行初始化</p>
+  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> create a new folder</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> init your Repository</span></span><br><span class="line">git init &lt;Folder_Name&gt;</span><br><span class="line"><span class="meta">#</span><span class="bash"> Another way to init Repository is get into your folder</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="keyword">then</span> use git init</span></span><br><span class="line">cd &lt;Folder&gt;</span><br><span class="line">git init</span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>复制别人的仓库</p>
+<p>当我们在 GitHub 或者 Gitee 上看到心动的程序，可以利用 Git 把代码抓取下来.</p>
+<p>首先我们需要找到对应的程序位置，然后找到文件栏上方的 仓库地址 进行复制。</p>
+  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone [address]</span><br></pre></td></tr></table></figure>
+<p>Git 会将这个 Repository 下载到我们的电脑中。git clone 预设会将下载的 git 存储在同名的文件夹中。如果需要自己命名的话，可以在后面加上自己的命名：</p>
+  <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git clone [address] &lt;FileName&gt;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h4 id="2-git-的基本操作"><a class="markdownIt-Anchor" href="#2-git-的基本操作"></a> 2、Git 的基本操作</h4>
+<h5 id="1-git-status"><a class="markdownIt-Anchor" href="#1-git-status"></a> 1) Git status</h5>
+<p>当我们在一个 Git 的 Repository 中，我们可以输入 <code>git status</code> 来检查当前 Git 的状态</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git status</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> On branch master</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="bash"><span class="comment"># Initial commit</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="bash"><span class="comment"># nothing to commit (create/copy files and use &#x27;git add&#x27; to track)</span></span></span><br></pre></td></tr></table></figure>
+<p>如果你看到了上面的信息，证明这是一个 <strong>崭新干净</strong> 的仓库，还没有被追踪或者修改。</p>
+<p><strong>On branch matser</strong> ：当前正在名为 <strong>master</strong> 的分支（branch）上。</p>
+<p>现在我们在这个目录下添加一个新的文件 “first.txt”，然后再查看一下仓库状态：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> &lt;Repository&gt; <span class="comment"># get into your Repository</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> touch first.txt</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git status</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> On branch master</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="bash"><span class="comment"># Initial commit</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="bash"><span class="comment"># Untrack files:</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> (use <span class="string">&quot;git add &lt;file&gt;...&quot;</span> to include <span class="keyword">in</span> what will be committed)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="bash"><span class="comment">#	first.txt</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="bash"><span class="comment"># nothing to commit (create/copy files and use &#x27;git add&#x27; to track)</span></span></span><br></pre></td></tr></table></figure>
+<p>我们可以看到这里多了个 Untrack files 的分类，这表示过去这个 Git Repository 并没有这个文件，first.txt 是一个未被追踪的文件。</p>
+<h5 id="2-git-add"><a class="markdownIt-Anchor" href="#2-git-add"></a> 2) Git add</h5>
+<p>如果我们要让 Git 能够跟踪这个档案的话。我们可以使用 <code>git add</code> 把它加入跟踪中：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git add first.txt</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git status</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git add test.rb</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git status</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> On branch master</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="bash"><span class="comment"># Initial commit</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="bash"><span class="comment"># Changes to be committed:</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash">   (use <span class="string">&quot;git rm --cached ...&quot;</span> to unstage)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"></span></span><br><span class="line"><span class="bash"><span class="comment">#   new file:   first.text</span></span></span><br><span class="line"><span class="meta">#</span></span><br></pre></td></tr></table></figure>
+<p>经过我们的 <code>git add first.txt</code> 后，文件就变成了 <strong>Change to commit</strong>，通常我们称这个状态叫做 <strong>stage</strong> ，修改过但还没使用 <code>git add</code> 的文档叫做 <strong>unstage</strong> 。</p>
+<h5 id="3-git-commit"><a class="markdownIt-Anchor" href="#3-git-commit"></a> 3) Git commit</h5>
+<p><code>Git commit</code> 指的是把当前写好的文件提交，commit 是写程序过程中一个重要的动作，一个 commit 相当于给当前程序进度<strong>存档</strong>，让我们未来在需要的时候都可以回到这些存档的状态。</p>
+<p>此时你会看到画面跳到 git 中设定的编辑画面：</p>
+<p>这个窗口最上方的空行是要给你输入这次 commit 的信息。例如可以在这里写下 “Add first.txt file to test git function” 来表示本次提交的目的。<strong>建议每次 commit 时候都要写清楚 commit 的内容</strong> 这样会方便后续查看代码。也能让其他队员了解你在做什么。</p>
+<p>写好 commit 后保存退出就会看到本次提交的变动。</p>
+<p>【作者很懒，没有留下输出结果】</p>
+<p>如果觉得每次跳出编辑器很麻烦，可以是用 commit 加上 -m 来快速提交</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git commit -m &quot;Add first.txt to test git function.&quot;</span><br></pre></td></tr></table></figure>
+<p>使用 <code>git log</code> 查看变动记录</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">log</span></span></span><br><span class="line"><span class="meta">#</span><span class="bash"> commit [version] (HEAD -&gt; master)</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Author: User &lt;Email&gt;</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> Date:	xxxx.xx.xx</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 	Add first.txt to <span class="built_in">test</span> git <span class="keyword">function</span>.</span></span><br></pre></td></tr></table></figure>
+<p>**补充：**还可以用 <code>git log --stat</code> or  <code>git log -p</code> 来看详情。</p>
+<p>当你需要修改档案的时候，可以遵循以下流程：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">graph LR</span><br><span class="line">a[Edit FileA]--&gt;b[git add]</span><br><span class="line">b--&gt;c[git commit]</span><br><span class="line">c--&gt;d[Edit FileB]</span><br></pre></td></tr></table></figure>
+<p>一般在完成一个阶段性小工作的时候就进行一次 commit 来及时保存程序开发进度。</p>
+<p><strong>冷知识：</strong> 某些文件我并不希望加入版本控制的跟踪中，例如说又个 Database 的 schema 或者是一些其他的 log 文件。这个时候你可以加入 <code>.gitignore</code> 来让 Git 忽略它。使用编辑器打开 <code>.gitignore</code> 档案</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> vim .gitignore</span></span><br></pre></td></tr></table></figure>
+<p>如果之前已经被跟踪的文件，是无法用 <code>.gitignore</code> 来完成的。需要将它们删除掉再 commit 后，使用 <code>.gitignore</code> 来设置忽略它们。</p>
+<h5 id="4git-branch"><a class="markdownIt-Anchor" href="#4git-branch"></a> 4）Git branch</h5>
+<p>分支（branch）应该是 Git 最重要的功能，在一个多人合作的开发过程中想要开发新功能或者修正某个 bug。当你完成开发后确认没问题再把它 merge（合并） 回主 Branch，如此便完成了新功能的开发或者 bug 的修正。</p>
+<p>我们可以用 <code>git branch</code> 来列出所有的 branch 并告诉你正在哪一个当前所在 branch。如果我们需要开设一个新的分支 branch 名为 cat：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git branch cat</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git branch</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> cat</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> *master    <span class="comment"># * means your present position</span></span></span><br></pre></td></tr></table></figure>
+<p>那么如何来切换当前的分支呢？我们利用 <code>git checkout cat</code> 来实现：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git checkout cat</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> switched to branch <span class="string">&#x27;cat&#x27;</span></span></span><br></pre></td></tr></table></figure>
+<p>如果我们在 cat 分支中继续开发并提交 commit。那么在 Git 中就会看到 cat 分支多了一个节点，这相当于对于 cat 的一个存档。此时 master 分支也继续开发，也 commit 了一一下，这是个时候就形成两个分支版本 master 和 cat。两者的版本从这里分开了，如果后续开发完成后，我们可以使用 <code>git rebase</code> or <code>git merge</code> 来合并版本：</p>
+<ul>
+<li><code>git rebase</code>：是基于分支 cat 提交后的版本</li>
+<li><code>git merge</code>：把当前各个分支一起融合</li>
+</ul>
+<h4 id="小结"><a class="markdownIt-Anchor" href="#小结"></a> 小结</h4>
+<p>git 的工作流程：</p>
+<ul>
+<li>在仓库中有一个 master 主分支是大家开发好或者修好 bug 后合并回去的对象。所有需要新开发的新功能或者是修 bug 都是从主 branch 拉出一个新的 branch 进行工作。</li>
+<li>当你完成一个阶段性任务后，将你刚刚所新增的内容使用 git add 加到 stage 的状态，然后 commit 加上信息</li>
+<li>反复上一个操作直到这个 branch 的主要目的完成了，这个时候你离主 branch 已经有了一段时间，或者是确定主 branch 上已经有了新的 commit，使用 git rebase 将自己的分支整理然后使用 git merge 合并回 branch，反之直接用 git merge 将自己 branch 的内容合并回去。</li>
+</ul>
+<h4 id="3-git-reset-取消上一次操作"><a class="markdownIt-Anchor" href="#3-git-reset-取消上一次操作"></a> 3、Git reset 取消上一次操作</h4>
+<h5 id="1取消-merge"><a class="markdownIt-Anchor" href="#1取消-merge"></a> 1）取消 merge</h5>
+<p>版本控制的最好好处是可以 <strong>无限后悔！</strong>，因此我们常常希望把已经暂存的档案、已经提交的 commit 或者是已经合并的 branch 取消修改，这个时候我们可以使用 <code>git reset</code> 这个指令来帮助我们，像现在我若是想要取消刚刚的 merge 动作，我只要：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git reset --hard ORIG_HEAD</span></span><br><span class="line">HEAD is now at [version] Config initialze</span><br></pre></td></tr></table></figure>
+<h5 id="2取消已经暂存的文件"><a class="markdownIt-Anchor" href="#2取消已经暂存的文件"></a> 2）取消已经暂存的文件</h5>
+<p>如果不小心把没有写完的文件 <code>git add</code> 加入 stage 了，那么后悔人可以用 <code>git reset HEAD &lt;file&gt;</code> 来取消这次 stage。</p>
+<h5 id="3取消修改过的档案"><a class="markdownIt-Anchor" href="#3取消修改过的档案"></a> 3）取消修改过的档案</h5>
+<p>如果后悔人想要完全放弃这次修改，回到上一个起点，可以使用 <code>git checkout -- &lt;file&gt;</code> 来恢复这个文件。</p>
+<p><strong>注意：</strong> 取消变更不会有任何信息，但这时你去看档案会发现他已经恢复成没有修改过的样子了。</p>
+<h5 id="4修改上一次的-commit"><a class="markdownIt-Anchor" href="#4修改上一次的-commit"></a> 4）修改上一次的 commit</h5>
+<p>如果后悔人由于手速太快，把 commit 的信息打错了，可以使用 <code>git commit --amend</code> 来帮助我们重新修改～</p>
+<h5 id="5终极后悔人强制恢复到上一个-commit-版本"><a class="markdownIt-Anchor" href="#5终极后悔人强制恢复到上一个-commit-版本"></a> 5）终极后悔人——强制恢复到上一个 commit 版本</h5>
+<p>作为一个 <strong>终极后悔人</strong> ，有时候要放弃所有修改回到 commit 之前的状态，这个时候我们可以使用 <code>git reset --hard HEAD</code> 来恢复，HEAD 参数可以加上一些变化，比如 HEAD^ 表示目前版本的上一个版本；HEAD~2 是再上一个版本。</p>
+<h5 id="补充"><a class="markdownIt-Anchor" href="#补充"></a> 补充</h5>
+<p>在上面的用法中，你可能已经发现了后悔人在使用 <code>git reset</code> 的时候会加入 soft 和 hard 参数。一般来说，<code>git reset</code> 会把目前状态恢复到你想要回到的版本。但是如果不加参数的话，会把你做过的修改仍然保留，但是，加上了 --soft 参数，则会把做过的修改加入 stage 中，若是加上了 hard 参数则是把做过的修改完全删除，回到版本开始的样子。</p>
+<h2 id="四-远程仓库的使用"><a class="markdownIt-Anchor" href="#四-远程仓库的使用"></a> 四、远程仓库的使用</h2>
+<p><strong>冷知识</strong>：「远程」仓库可以在你的本地主机上。「远程」未必表示仓库在网络或者互联网上，表示可以远程访问。</p>
+<h4 id="1-查看远程仓库"><a class="markdownIt-Anchor" href="#1-查看远程仓库"></a> 1、查看远程仓库</h4>
+<p>使用 <code>git remote</code> 命令，如果你已经 clone 了自己的仓库，那么至少会看到一个 <strong>origin</strong> （这个是 Git 给你克隆仓库服务器的默认名字）</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> [http]</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 连接到 github 或者 gitee 等其他分布式代码库</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> user@ip:xxx/xxx.git</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 连接到另一个主机的仓库</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> <span class="built_in">test</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git remote</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> origin</span></span><br></pre></td></tr></table></figure>
+<p>也可以是使用选项 -v 现实需要读写远程仓库使用的 Git 保存的简写与其对应的 URL</p>
+<p>网上的 栗子🌰：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git remote -v</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> User  Remote Repository  Permission</span></span><br><span class="line">origin	https://github.com/schacon/ticgit (fetch)</span><br><span class="line">origin	https://github.com/schacon/ticgit (push)</span><br><span class="line">bakkdoor  https://github.com/bakkdoor/grit (fetch)</span><br><span class="line">bakkdoor  https://github.com/bakkdoor/grit (push)</span><br><span class="line">cho45     https://github.com/cho45/grit (fetch)</span><br><span class="line">cho45     https://github.com/cho45/grit (push)</span><br></pre></td></tr></table></figure>
+<h4 id="2-添加远程仓库"><a class="markdownIt-Anchor" href="#2-添加远程仓库"></a> 2、添加远程仓库</h4>
+<p><code>git remote add &lt;shortname&gt; &lt;url&gt;</code> 添加一个新的 Git 仓库，同时指定一个方便使用的简写&lt;shortname&gt; ：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git remote</span></span><br><span class="line">origin</span><br><span class="line"><span class="meta">$</span><span class="bash"> git remote add pd &lt;url&gt;</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git remote -v</span></span><br><span class="line">origin  https://github.com/...</span><br><span class="line">pd		https://github.com/...</span><br></pre></td></tr></table></figure>
+<p>现在我们可用字符串 pd 来代替整个 URL：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> get new data from remote Repository</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git fetch pd</span></span><br></pre></td></tr></table></figure>
+<h4 id="3-从远程仓库中抓取与拉取"><a class="markdownIt-Anchor" href="#3-从远程仓库中抓取与拉取"></a> 3、从远程仓库中抓取与拉取</h4>
+<p>从远程仓库获取数据：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git fetch &lt;remote&gt;</span></span><br></pre></td></tr></table></figure>
+<p>这个命令会访问远程的仓库，从中拉取所有你还没有的数据。执行完后，你就会拥有远程仓库中所有的信息，可以随时合并或者查看。</p>
+<p>如果使用的是 <code>clone</code> 克隆一个仓库，命令会自动将其添加为远程仓库并默认为 “origin” 为简写。</p>
+<p><code>git fetch origin</code> 会抓取克隆后新推送的所有工作。必须注意 <code>git fetch</code> 命令只会将数据下载到你的本地仓库，它并不会自动合成或者修改你当前的工作。当准备好时你必须手动将其合并入你的工作。</p>
+<h4 id="4-推送到远程仓库"><a class="markdownIt-Anchor" href="#4-推送到远程仓库"></a> 4、推送到远程仓库</h4>
+<p>当你想分享你的项目时，必须将其推送到上游。这个命令很简单：<code>git push &lt;remote&gt; &lt;branch&gt;</code> 当你想要将 master 分支推送到 origin 服务器时，这个命令可以将你所做的备份到服务器：<code>$ git push origin master</code> （猪油当你有克隆服务器的写入权限，并且之前没有人推送过时，这个命令才会生效，当你和其他人同时克隆，他们会先推送到上游然后你再推送到上游，你的推送毫无疑问会被拒绝，你必须先抓取他们的工作并合并到你的工作后才能推送！）</p>
+<h4 id="5-查看某个远程仓库"><a class="markdownIt-Anchor" href="#5-查看某个远程仓库"></a> 5、查看某个远程仓库</h4>
+<p><code>git remote show &lt;remote&gt;</code> 如果想以一个特定的缩写名运行这个命令，例如 origin ，会看到下面类似的信息。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git remote show origin</span></span><br><span class="line">* remote origin</span><br><span class="line">  Fetch URL: https://github.com/schacon/ticgit</span><br><span class="line">  Push  URL: https://github.com/schacon/ticgit</span><br><span class="line">  HEAD branch: master</span><br><span class="line">  Remote branches:</span><br><span class="line">    master                               tracked</span><br><span class="line">    dev-branch                           tracked</span><br><span class="line">  Local branch configured for &#x27;git pull&#x27;:</span><br><span class="line">    master merges with remote master</span><br><span class="line">  Local ref configured for &#x27;git push&#x27;:</span><br><span class="line">    master pushes to master (up to date)</span><br></pre></td></tr></table></figure>
+<p>它会列出远程仓库的 URL 与跟踪分支的信息。这些信息非常有用，他告诉你正处于 master 的分支，如果运行 git pull，就会抓取所有的远程引用，然后将远程 master 分支合并到本地 master 分支。</p>
+<h5 id="6-远程仓库的重命名与移除"><a class="markdownIt-Anchor" href="#6-远程仓库的重命名与移除"></a> 6、远程仓库的重命名与移除</h5>
+<p><code>git remote rename</code> 重命名</p>
+<p>注意，修改之后，git也会自动修改你所有远程跟踪的分支名字。那些过去引用上一个名字的分支现在会变成新的名字。</p>
+<p>如果需要移除一个远程仓库——你已经从服务器上搬走了或者不想再使用某一个特定的镜像时候，或者不想再贡献了了——可以使用 <code>git remote remove</code> or <code>git remote rm</code> 来移除。</p>
+<p><strong>注意⚠️</strong>：一旦使用这个方式删除了一个远程仓库，那么所有和这个远程仓库相关的远程跟踪分支以及配置信息也会一起被删除。</p>
+<h2 id="五-在服务器-本机上搭建-git-ssh"><a class="markdownIt-Anchor" href="#五-在服务器-本机上搭建-git-ssh"></a> 五、在服务器 / 本机上搭建 Git （SSH）</h2>
+<h4 id="1-创建-裸仓库"><a class="markdownIt-Anchor" href="#1-创建-裸仓库"></a> 1、创建 裸仓库</h4>
+<p>在开设 Git 服务器前，需要把现有的仓库导出为一个<strong>裸仓库</strong>（一个不含当前工作目录的仓库）这通常是很简单的。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> git <span class="built_in">clone</span> --bare myRepository myRepository.git</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> git init --bare myRepository myRepository.git</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 一般仓库都会命名为 xxx.git</span></span><br></pre></td></tr></table></figure>
+<p>现在，你的 myRepository 目录应该有 Git 目录的副本了。</p>
+<p>也可以用 cp 来实现：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp -Rf myRepository/.git myRepository.git</span><br></pre></td></tr></table></figure>
+<h4 id="2-把裸仓库放到服务器上ssh"><a class="markdownIt-Anchor" href="#2-把裸仓库放到服务器上ssh"></a> 2、把裸仓库放到服务器上（SSH）</h4>
+<p>既然已经拥有了裸仓库的副本，剩下要做的就是把裸仓库放到服务器上并设置你的协议。</p>
+<p>如果你有一台所有开发者都可以用 SSH 连接的服务器，架设你的第一个仓库就十分简单了， 因为你几乎什么都不用做（正如我们上一节所说的）。 如果你想在你的仓库上设置更复杂的访问控制权限，只要使用服务器操作系统的普通的文件系统权限就行了。</p>
+<p>如果需要团队里的每个人都对仓库有写权限，又不能给每个人在服务器上建立账户，那么提供 SSH 连接就是唯一的选择了。 我们假设用来共享仓库的服务器已经安装了 SSH 服务，而且你通过它访问服务器。</p>
+<p>这里提供一种方法：在一个主机上建立一个 git 账户，让每一个需要写权限的人发送一个 SSH 公钥，然后将其加入 git 账户的 <code>~/.ssh/authorized_keys</code> 文件。这样一来，所有人都将通过 git 账户访问主机。这一点也不会影响提交的数据——访问主机用的身份影响提交对象的提交者信息。</p>
+<h4 id="3-服务器上的-git-生成-ssh-公钥"><a class="markdownIt-Anchor" href="#3-服务器上的-git-生成-ssh-公钥"></a> 3、服务器上的 Git —— 生成 SSH 公钥</h4>
+<p>目前，许多的 Git 服务器都使用 SSH 公钥进行认证。为了向 Git 服务器提供 SSH 公钥，如果某系统用户为拥有密钥，必须事先为他生成一份。</p>
+<p>首先，需要确认一下自己是否已经拥有密钥。默认情况下，用户的 SSH 的密钥存储在其 <code>~/.ssh</code> 目录下。可以查阅该目录查看是否已经有密钥：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> ~/.ssh</span></span><br></pre></td></tr></table></figure>
+<p>我们需要找到一对以 <code>id_dsa</code> 或 <code>id_rsa</code> 命名的文件，其中一个带有 <code>.pub</code> 拓展名，这个就是我们需要用 <strong>公钥</strong> （pub = public）如果很可惜并没有找到这个文件也没有关系，可以使用 <code>ssh-keygen</code> 重新创建它。</p>
+<blockquote>
+<p>Linux / MacOS：SSH 软件包</p>
+<p>Windows：MSysGit 软件包</p>
+</blockquote>
+<p>使用 <code>ssh-keygen</code> 会确认密钥存储位置（默认为 .ssh/id_rsa）然后回要求你输入两次密钥口令（这里不想填可以直接回车）</p>
+<p>然后用户只需要把密钥发给任意一个 Git 服务器管理员。他们需要做的就是复制各自的 .pub 文件内容。</p>
+<h4 id="4-服务器上的-git-配置服务器"><a class="markdownIt-Anchor" href="#4-服务器上的-git-配置服务器"></a> 4、服务器上的 Git —— 配置服务器</h4>
+<p>生成 SSH 公钥后，我们还需要配置服务器的 SSH 访问。其中，我们将使用 <code>authorized_keys</code> 方法对用户<strong>进行认证</strong>。</p>
+<p>我们以 <strong>Ubuntu</strong> 为例，首先创建一个操作系统用户 <code>git</code> 并用 <code>ssh-keygen</code> 生成一个 <code>.ssh</code> 目录。</p>
+<p>我们采用智能化操作 <code>ssh-copy-id</code>自动完成。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ssh-copy-id [-i [identy_file]] [user@]machine</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> -i：指定公钥文件</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> ssh-copy-id 将 Key 写到远程机器的 ~/.ssh/authorized_key 文件中</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> ssh [user@]machine <span class="comment"># 进入远程机器</span></span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://git-scm.com/book/zh/v2/%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E7%9A%84-Git-%E9%85%8D%E7%BD%AE%E6%9C%8D%E5%8A%A1%E5%99%A8">More Details…</a></p>
+<h2 id="六-补充ubuntu-使用-ssh-连接远程电脑"><a class="markdownIt-Anchor" href="#六-补充ubuntu-使用-ssh-连接远程电脑"></a> 六、补充：Ubuntu 使用 ssh 连接远程电脑</h2>
+<p>Unbuntu 是默认安装了 <strong>ssh</strong> 的客户端，即可以连接别人的电脑。</p>
+<p><strong>ssh</strong> 分为服务端和客户端，安装命令：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo apt-get install openssh-client <span class="comment"># Client</span></span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo apt-get install openssh-server <span class="comment"># Server</span></span></span><br></pre></td></tr></table></figure>
+<p>安装完成后就会自动开启服务，可以通过 <code>ps -e | grep ssh</code> 来查看，如果出现了 <code>ssh-agent</code> 则说明开启成功。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 如果你想要关闭，输入：</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo service ssh stop</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 如果要开启，输入：</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo service ssh start</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-连接远程电脑"><a class="markdownIt-Anchor" href="#1-连接远程电脑"></a> 1、连接远程电脑</h4>
+<p><code>ssh user@ip</code></p>
+<p>user ：该电脑的一个用户</p>
+<p>ip：     指该电脑的 ip 地址（远程连接的电脑最好是静态 ip）</p>
+<p>如果不知道自己的 ip 地址，可以输入命令查看：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ifconfig</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> <span class="keyword">if</span> <span class="string">&#x27;ifconfig&#x27;</span> is not found, try to install net-tools</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> sudo apt install net-tools</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> after installation, use ifconfig to get your ip</span></span><br></pre></td></tr></table></figure>
+<p>然后执行命令 <code>ssh user@ip</code> ，执行命令后会让你输入密码，主要输入 <code>user</code> 的密码就行了。</p>
+<blockquote>
+<p>作为首次连接，作为 Server 的一端会询问，联机的 key 尚未建立，是否接受 Server 传来的 Key，并建立联机？</p>
+</blockquote>
+<p>这个时候请务必输入 <strong>yes</strong> 而不是 y or Y，这样程序才会接受。</p>
+<h4 id="2-利用公钥来登陆远程电脑-服务器"><a class="markdownIt-Anchor" href="#2-利用公钥来登陆远程电脑-服务器"></a> 2、利用公钥来登陆远程电脑 / 服务器</h4>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> ssh-copy-id user@machine</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 执行这一步操作，需要输入 machine 上 user 用户的登录密码</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 执行成功后，登录远程电脑查看</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> user@machine</span></span><br><span class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> ~/.ssh</span></span><br><span class="line"><span class="meta">#</span><span class="bash"> 可以看到应该多了一个 authorized_keys 文件，进去查看应该可以看到公钥已经被添加上了。</span></span><br></pre></td></tr></table></figure>
+<h4 id="3-补充1-ssh-公钥私钥的原理"><a class="markdownIt-Anchor" href="#3-补充1-ssh-公钥私钥的原理"></a> 3、补充1： SSH 公钥私钥的原理</h4>
+<p>其实在我们使用命令 <code>ssh-kegen</code> 的时候，不仅仅生成了一个 id_rsa 而且还有一个 id_rsa.pub 。其中没有后缀的是私钥，是需要保存在本机的（<strong>为了系统安全请勿传播私钥</strong>），后者为公钥，可以发送给服务器的。</p>
+<p>当采用 ssh 远程登录的时候：</p>
+<ul>
+<li>1）首先客户机请求远程主机，远程主机根据 <code>authorized_keys</code> 中对本机公钥内容加密一个请求，返回给客户端。</li>
+<li>2）客户端利用私钥解密，然后再发送给远程主机，远程主机收到了准确的应答，就认可了该用户是可信的。因此允许登陆。</li>
+</ul>
+<p>所以到头来，最关键的还是公钥与私钥的匹配。所以还是要保护好自己的私钥以免产生安全隐患。</p>
+<p>参考网站： <a target="_blank" rel="noopener" href="https://blog.csdn.net/feinifi/article/details/78213297">CSDN博客</a></p>
+<h4 id="4-补充2关于电脑通过网络连接的-ip"><a class="markdownIt-Anchor" href="#4-补充2关于电脑通过网络连接的-ip"></a> 4、补充2：关于电脑通过网络连接的 IP</h4>
+<p>在进行网络连接的时候，大多数时间我都是访问诸如 <a target="_blank" rel="noopener" href="http://www.baidu.com">www.baidu.com</a> ，<a target="_blank" rel="noopener" href="http://www.google.com">www.google.com</a> ， <a target="_blank" rel="noopener" href="http://www.4399.com">www.4399.com</a> 等这一类网站。这些 <a target="_blank" rel="noopener" href="http://www.xxx.com">www.xxx.com</a> （或者是其他 .org , .cn , .us……）这些名字成为 <strong>域名</strong>（<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/%E5%9F%9F%E5%90%8D">wiki链接</a>），域名简单来说就是一个 <strong>IP</strong> 地址的别称，主要是可自定义，方便记忆。那么抛开这个别称，我们在网上冲浪的时候，其实电脑连接的是这些别名对应的 <strong>IP地址</strong>。而像上面提到的我们随时可以访问的 <strong>IP地址</strong> 其实叫做 <strong>公网IP</strong></p>
+<blockquote>
+<p><strong>公网IP</strong> ：意味着这个是公共的，开放的 IP 地址，我们只要连接互联网均可以访问</p>
+</blockquote>
+<p>与之相对的是 <strong>内网IP</strong> ，所谓 <strong>内网IP</strong> 的概念是相对于 <strong>公网IP</strong> 的，这就需要参考互联网的组成，这里给出一个简单的解释（如果还是不懂可以自行百度一下）：</p>
+<blockquote>
+<p>所谓互联网通信，其实本质上是一方（手机、电脑等）连接另一方（一般是服务器，也可以是电脑，智能家居等设备），那么在错综复杂的网络线路中，我们需要将我们的数据传输给对应的接收方。这个听起来有点复杂，其实我们只需要理解成如何把一个快递送到指定的人手中。我们都体验过邮寄服务，当我们需要邮寄给一个人时，我们需要知道 <strong>他的地址</strong>，在网络世界中， 这个 <strong>地址</strong> 就是 <strong>IP</strong>。IP地址也就4个三位数组成，但是我们拥有数以亿计的设备需要在互联网上用心，那么我们该如何给每一个设备都规定一个地址呢？这里就要引入 公网IP 和 内网IP。</p>
+<p>那么如何理解 <strong>公网IP</strong> 和 <strong>内网IP</strong> 呢？</p>
+<p>我们可以假设你邮寄的对方住在 <strong>南京市仙林大道123号阳光小区999号</strong>，这是一个完整的地址，其中 <strong>999号</strong> 是对方在小区中的相对门牌号，这个门牌号放在 <strong>不同的小区</strong> 对应 <strong>不同的人</strong> 。只有在 <strong>阳光小区</strong> 才是你需要邮寄的人，因此这个 <strong>999号</strong> 实际上就是 <strong>内网IP</strong>，是我们这个 阳光小区内网的一个地址 。而外部的邮递员只需要把邮件发送给阳光小区，拜托阳光小区的业务人员把快递放到家门口。对于邮递员而言，他把包裹发送到阳光小区即可，这时阳光小区对传输而言就是一个公共的，开放的 <strong>公网IP</strong> 。</p>
+<p>如果我们把这种关系用图画出来，应该是一个树状图，每一个节点都是一个 <strong>交换机</strong> 或者 <strong>路由器</strong> ，而每条线路的起点终点都是一台真实存在的设备。通过公网IP找到对应的「小区」，在通过小区找到对应的「门牌号」，就是整个数据传输的过程。网络线路中的邮递员可没有我们真实的邮递聪明，它只认得「小区」这个公网IP，对于内部的「门牌号」内网IP是不可见的。</p>
+<p>比如你的路由器给你分配的 IP 地址是 <a target="_blank" rel="noopener" href="http://192.168.xxx.xxx">192.168.xxx.xxx</a>。而对于上一级网络这个路由器的 IP 地址是 172.123.123.001 。这个时候有一个服务器 172.123.123.002 只能访问到 172.123.123.001，对于里面的设备是不可以直接访问的，只能拜托路由器把数据转发给 <a target="_blank" rel="noopener" href="http://192.168.xxx.xxx">192.168.xxx.xxx</a> 这个内部地址。而对于 <a target="_blank" rel="noopener" href="http://192.168.xxx.xxx">192.168.xxx.xxx</a> 他可以拜托路由器把数据发送给 172.123.123.002 。所以如果你是 172.123.123.003 且在这个网络下已经有许多路由器，你想要直接访问 <a target="_blank" rel="noopener" href="http://192.168.xxx.xxx">192.168.xxx.xxx</a> ，那么每个路由器会陷入思考——究竟是不是自己的小区的门牌号。这时这个包裹就会被退回，因为你所写的地址不够准确。</p>
+<p>显然，公网IP 的个数是有限制的，因此绝大部分我们得到的IP都是内网IP（这个是广义的内网）。但是随着我们</p>
+</blockquote>
+<p><strong>冷知识：</strong> 校园网本身就是一个非常巨大的局域网。</p>
+<p>参考资料：<a target="_blank" rel="noopener" href="https://blog.csdn.net/codejas/article/details/80048231">互联网组成</a> ， <a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/36542469">为什么要使用IPV6</a></p>
+<hr />
+<p>本文章参考自 <a target="_blank" rel="noopener" href="https://blog.csdn.net/chaichuanfa/article/details/42489217">CSDN</a> 、<a target="_blank" rel="noopener" href="https://docs.github.com/en/github/getting-started-with-github/set-up-git">Github 教程</a>、 <a target="_blank" rel="noopener" href="http://blog.gogojimmy.net/2012/01/17/how-to-use-git-1-git-basic/">博客</a> 以及 <a target="_blank" rel="noopener" href="https://git-scm.com">Git 教程</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/Git/" rel="tag"># Git</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/04/08/How-to-use-Makefile/" rel="prev" title="How to Use Makefile">
+      <i class="fa fa-chevron-left"></i> How to Use Makefile
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/07/04/test/" rel="next" title="test">
+      test <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text"> 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80-%E5%AE%89%E8%A3%85-git"><span class="nav-number">2.</span> <span class="nav-text"> 一、安装 Git</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C-%E8%AE%BE%E7%BD%AE%E4%BD%A0%E7%9A%84-git"><span class="nav-number">3.</span> <span class="nav-text"> 二、设置你的 Git</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89-%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8-git"><span class="nav-number">4.</span> <span class="nav-text"> 三、开始使用 Git</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E5%BB%BA%E7%AB%8B%E4%BB%93%E5%BA%93"><span class="nav-number">4.0.1.</span> <span class="nav-text"> 1、建立仓库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-git-%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">4.0.2.</span> <span class="nav-text"> 2、Git 的基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-git-status"><span class="nav-number">4.0.2.1.</span> <span class="nav-text"> 1) Git status</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-git-add"><span class="nav-number">4.0.2.2.</span> <span class="nav-text"> 2) Git add</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-git-commit"><span class="nav-number">4.0.2.3.</span> <span class="nav-text"> 3) Git commit</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4git-branch"><span class="nav-number">4.0.2.4.</span> <span class="nav-text"> 4）Git branch</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B0%8F%E7%BB%93"><span class="nav-number">4.0.3.</span> <span class="nav-text"> 小结</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-git-reset-%E5%8F%96%E6%B6%88%E4%B8%8A%E4%B8%80%E6%AC%A1%E6%93%8D%E4%BD%9C"><span class="nav-number">4.0.4.</span> <span class="nav-text"> 3、Git reset 取消上一次操作</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1%E5%8F%96%E6%B6%88-merge"><span class="nav-number">4.0.4.1.</span> <span class="nav-text"> 1）取消 merge</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2%E5%8F%96%E6%B6%88%E5%B7%B2%E7%BB%8F%E6%9A%82%E5%AD%98%E7%9A%84%E6%96%87%E4%BB%B6"><span class="nav-number">4.0.4.2.</span> <span class="nav-text"> 2）取消已经暂存的文件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3%E5%8F%96%E6%B6%88%E4%BF%AE%E6%94%B9%E8%BF%87%E7%9A%84%E6%A1%A3%E6%A1%88"><span class="nav-number">4.0.4.3.</span> <span class="nav-text"> 3）取消修改过的档案</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4%E4%BF%AE%E6%94%B9%E4%B8%8A%E4%B8%80%E6%AC%A1%E7%9A%84-commit"><span class="nav-number">4.0.4.4.</span> <span class="nav-text"> 4）修改上一次的 commit</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5%E7%BB%88%E6%9E%81%E5%90%8E%E6%82%94%E4%BA%BA%E5%BC%BA%E5%88%B6%E6%81%A2%E5%A4%8D%E5%88%B0%E4%B8%8A%E4%B8%80%E4%B8%AA-commit-%E7%89%88%E6%9C%AC"><span class="nav-number">4.0.4.5.</span> <span class="nav-text"> 5）终极后悔人——强制恢复到上一个 commit 版本</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%A1%A5%E5%85%85"><span class="nav-number">4.0.4.6.</span> <span class="nav-text"> 补充</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B-%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">5.</span> <span class="nav-text"> 四、远程仓库的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E6%9F%A5%E7%9C%8B%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93"><span class="nav-number">5.0.1.</span> <span class="nav-text"> 1、查看远程仓库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E6%B7%BB%E5%8A%A0%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93"><span class="nav-number">5.0.2.</span> <span class="nav-text"> 2、添加远程仓库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E4%BB%8E%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93%E4%B8%AD%E6%8A%93%E5%8F%96%E4%B8%8E%E6%8B%89%E5%8F%96"><span class="nav-number">5.0.3.</span> <span class="nav-text"> 3、从远程仓库中抓取与拉取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E6%8E%A8%E9%80%81%E5%88%B0%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93"><span class="nav-number">5.0.4.</span> <span class="nav-text"> 4、推送到远程仓库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-%E6%9F%A5%E7%9C%8B%E6%9F%90%E4%B8%AA%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93"><span class="nav-number">5.0.5.</span> <span class="nav-text"> 5、查看某个远程仓库</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#6-%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93%E7%9A%84%E9%87%8D%E5%91%BD%E5%90%8D%E4%B8%8E%E7%A7%BB%E9%99%A4"><span class="nav-number">5.0.5.1.</span> <span class="nav-text"> 6、远程仓库的重命名与移除</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94-%E5%9C%A8%E6%9C%8D%E5%8A%A1%E5%99%A8-%E6%9C%AC%E6%9C%BA%E4%B8%8A%E6%90%AD%E5%BB%BA-git-ssh"><span class="nav-number">6.</span> <span class="nav-text"> 五、在服务器 &#x2F; 本机上搭建 Git （SSH）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E5%88%9B%E5%BB%BA-%E8%A3%B8%E4%BB%93%E5%BA%93"><span class="nav-number">6.0.1.</span> <span class="nav-text"> 1、创建 裸仓库</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E6%8A%8A%E8%A3%B8%E4%BB%93%E5%BA%93%E6%94%BE%E5%88%B0%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8Assh"><span class="nav-number">6.0.2.</span> <span class="nav-text"> 2、把裸仓库放到服务器上（SSH）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E7%9A%84-git-%E7%94%9F%E6%88%90-ssh-%E5%85%AC%E9%92%A5"><span class="nav-number">6.0.3.</span> <span class="nav-text"> 3、服务器上的 Git —— 生成 SSH 公钥</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%8A%E7%9A%84-git-%E9%85%8D%E7%BD%AE%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">6.0.4.</span> <span class="nav-text"> 4、服务器上的 Git —— 配置服务器</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD-%E8%A1%A5%E5%85%85ubuntu-%E4%BD%BF%E7%94%A8-ssh-%E8%BF%9E%E6%8E%A5%E8%BF%9C%E7%A8%8B%E7%94%B5%E8%84%91"><span class="nav-number">7.</span> <span class="nav-text"> 六、补充：Ubuntu 使用 ssh 连接远程电脑</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E8%BF%9E%E6%8E%A5%E8%BF%9C%E7%A8%8B%E7%94%B5%E8%84%91"><span class="nav-number">7.0.1.</span> <span class="nav-text"> 1、连接远程电脑</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-%E5%88%A9%E7%94%A8%E5%85%AC%E9%92%A5%E6%9D%A5%E7%99%BB%E9%99%86%E8%BF%9C%E7%A8%8B%E7%94%B5%E8%84%91-%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-number">7.0.2.</span> <span class="nav-text"> 2、利用公钥来登陆远程电脑 &#x2F; 服务器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E8%A1%A5%E5%85%851-ssh-%E5%85%AC%E9%92%A5%E7%A7%81%E9%92%A5%E7%9A%84%E5%8E%9F%E7%90%86"><span class="nav-number">7.0.3.</span> <span class="nav-text"> 3、补充1： SSH 公钥私钥的原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E8%A1%A5%E5%85%852%E5%85%B3%E4%BA%8E%E7%94%B5%E8%84%91%E9%80%9A%E8%BF%87%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5%E7%9A%84-ip"><span class="nav-number">7.0.4.</span> <span class="nav-text"> 4、补充2：关于电脑通过网络连接的 IP</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Chris</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">12</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/chrisz-nju" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;chrisz-nju" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
