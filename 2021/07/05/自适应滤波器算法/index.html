@@ -30,8 +30,10 @@
 <meta property="og:image" content="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/img/v2-efd7c738f10d424094a592a412af9f52_1440w.jpg">
 <meta property="og:image" content="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/img/v2-10bb8eb6d121cea31cddfebf86db5176_1440w.jpg">
 <meta property="og:image" content="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/img/image-20210707045051184.png">
+<meta property="og:image" content="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/img/image-20210707214109958.png">
+<meta property="og:image" content="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/img/image-20210707214150391.png">
 <meta property="article:published_time" content="2021-07-05T05:15:06.000Z">
-<meta property="article:modified_time" content="2021-07-07T00:02:11.417Z">
+<meta property="article:modified_time" content="2021-07-07T13:44:21.879Z">
 <meta property="article:author" content="Chris">
 <meta property="article:tag" content="DSP">
 <meta name="twitter:card" content="summary">
@@ -195,7 +197,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-07-07 08:02:11" itemprop="dateModified" datetime="2021-07-07T08:02:11+08:00">2021-07-07</time>
+                <time title="Modified: 2021-07-07 21:44:21" itemprop="dateModified" datetime="2021-07-07T21:44:21+08:00">2021-07-07</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -322,11 +324,16 @@ w(n+L)=w(n+L-1)+\mu X(n+(L-1))e(n+(L-1))\\
 <figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">% Block-Least-Mean-Square Algorithm</span></span><br><span class="line"><span class="comment">% d - 期望响应</span></span><br><span class="line"><span class="comment">% x - 输入信号</span></span><br><span class="line"><span class="comment">% mu - 步长因子</span></span><br><span class="line"><span class="comment">% M - 滤波器阶数</span></span><br><span class="line"><span class="comment">% L - 块长度</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[en, yn, w]</span> = <span class="title">Block_LMS</span><span class="params">(d, x, mu, M, L)</span></span></span><br><span class="line">	len_d = <span class="built_in">length</span>(d);		<span class="comment">% 输入信号</span></span><br><span class="line">	k = <span class="built_in">floor</span>(len_d / L);	<span class="comment">% 分段，不足一段的部分舍弃</span></span><br><span class="line">	y = <span class="built_in">zeros</span>(len_d , <span class="number">1</span>);	<span class="comment">% 初始化输出序列 y</span></span><br><span class="line">	w = <span class="built_in">zeros</span>(M, k+<span class="number">1</span>);		<span class="comment">% 滤波器系数矩阵: M 阶，递归 k 次</span></span><br><span class="line">	e = <span class="built_in">zeros</span>(len_d, <span class="number">1</span>);	<span class="comment">% 初始化误差序列 e</span></span><br><span class="line">	x_ = [<span class="built_in">zeros</span>(M<span class="number">-1</span>,<span class="number">1</span>); x];</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>:k</span><br><span class="line">		block_sum = <span class="number">0</span>;</span><br><span class="line">		<span class="comment">% 求每一个块的和 sum</span></span><br><span class="line">		<span class="keyword">for</span> <span class="built_in">j</span> = (<span class="number">1</span>+L*(k<span class="number">-1</span>)):L*K</span><br><span class="line">			X = x_(<span class="built_in">j</span>:<span class="built_in">j</span>+M<span class="number">-1</span>);</span><br><span class="line">			y(<span class="built_in">i</span>) = w(:,k)&#x27;*x; <span class="comment">% 滤波器输出</span></span><br><span class="line">			</span><br><span class="line">			e(<span class="built_in">i</span>) = d(<span class="built_in">i</span>) - y(<span class="built_in">i</span>);</span><br><span class="line">			block_sum = block_sum + X * e(<span class="built_in">i</span>);</span><br><span class="line">		<span class="keyword">end</span></span><br><span class="line">		w(:k+<span class="number">1</span>) = w(:,k) + mu * block_sum;</span><br><span class="line">	<span class="keyword">end</span></span><br><span class="line">	<span class="comment">% 移动一步，使第 n 行对应第时间 n</span></span><br><span class="line">	w = w(:,<span class="number">2</span>:k+<span class="number">1</span>);</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
 <h5 id="322-基于-c-语言实现"><a class="markdownIt-Anchor" href="#322-基于-c-语言实现"></a> 3.2.2 基于 C 语言实现</h5>
 <p>头文件 BLMS.h</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ------ BLMS.h ------</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ------ BLMS.h ------</span></span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
 <p>源文件 BLMS.c</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ------ BLMS.c -------</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ------ BLMS.c -------</span></span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
 <h3 id="4-blms-与-lms-实际测试"><a class="markdownIt-Anchor" href="#4-blms-与-lms-实际测试"></a> 4 BLMS 与 LMS 实际测试</h3>
-<p>在 BLMS 中，如果 L = N</p>
+<p>在实际测试中其实可以发现 LMS 算法得到的结果：下面两个图分别表示 BLMS 与 LMS 算法在相同输入情况下的结果：</p>
+<p>BLMS：</p>
+<p><img src="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/img/image-20210707214109958.png" alt="BLMS Algorithm" /></p>
+<p>LMS：</p>
+<p><img src="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/img/image-20210707214150391.png" alt="LMS Algorithm" /></p>
+<p>通过对比我们可以看出，BLMS 相对 LMS 而言收敛得更好，计算量更小。</p>
 
     </div>
 
