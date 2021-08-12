@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/Quark/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/Quark/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/Quark/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/Quark/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/Quark/css/main.css">
+
+
+<link rel="stylesheet" href="/Quark/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"chrisz-nju.github.io","root":"/Quark/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":240,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="——Jan.23.2021  目录 本次项目采用正点原子STM32F407探索者开发版和STM32cubeIDE软件开发  STM32的RTC时钟功能简单介绍 电子时钟项目计划 开发过程、遇到的问题和解决方案">
+<meta property="og:type" content="article">
+<meta property="og:title" content="STM32之HAL库学习——电子时钟项目（1）">
+<meta property="og:url" content="https://chrisz-nju.github.io/Quark/2021/01/22/STM32%E5%8D%95%E7%89%87%E6%9C%BAHAL%E5%BA%93%E5%AD%A6%E4%B9%A0%EF%BC%88macOS%EF%BC%89%EF%BC%885%EF%BC%89%E2%80%94%E2%80%94/index.html">
+<meta property="og:site_name" content="Qurak">
+<meta property="og:description" content="——Jan.23.2021  目录 本次项目采用正点原子STM32F407探索者开发版和STM32cubeIDE软件开发  STM32的RTC时钟功能简单介绍 电子时钟项目计划 开发过程、遇到的问题和解决方案">
+<meta property="og:locale">
+<meta property="og:image" content="https://chrisz-nju.github.io/Quark/2021/01/22/STM32%E5%8D%95%E7%89%87%E6%9C%BAHAL%E5%BA%93%E5%AD%A6%E4%B9%A0%EF%BC%88macOS%EF%BC%89%EF%BC%885%EF%BC%89%E2%80%94%E2%80%94/STM32单片机HAL库学习（macOS）（5）——/公式.png">
+<meta property="og:image" content="https://chrisz-nju.github.io/Quark/2021/01/22/STM32%E5%8D%95%E7%89%87%E6%9C%BAHAL%E5%BA%93%E5%AD%A6%E4%B9%A0%EF%BC%88macOS%EF%BC%89%EF%BC%885%EF%BC%89%E2%80%94%E2%80%94/STM32%E5%8D%95%E7%89%87%E6%9C%BAHAL%E5%BA%93%E5%AD%A6%E4%B9%A0%EF%BC%88macOS%EF%BC%89%EF%BC%885%EF%BC%89%E2%80%94%E2%80%94/%E9%A1%B9%E7%9B%AE%E8%AE%A1%E5%88%92.png">
+<meta property="og:image" content="https://chrisz-nju.github.io/Quark/2021/01/22/STM32%E5%8D%95%E7%89%87%E6%9C%BAHAL%E5%BA%93%E5%AD%A6%E4%B9%A0%EF%BC%88macOS%EF%BC%89%EF%BC%885%EF%BC%89%E2%80%94%E2%80%94/STM32单片机HAL库学习（macOS）（5）——/LSE时钟源.png">
+<meta property="og:image" content="https://chrisz-nju.github.io/Quark/2021/01/22/STM32%E5%8D%95%E7%89%87%E6%9C%BAHAL%E5%BA%93%E5%AD%A6%E4%B9%A0%EF%BC%88macOS%EF%BC%89%EF%BC%885%EF%BC%89%E2%80%94%E2%80%94/STM32单片机HAL库学习（macOS）（5）——/时钟树配置.png">
+<meta property="og:image" content="https://chrisz-nju.github.io/Quark/2021/01/22/STM32%E5%8D%95%E7%89%87%E6%9C%BAHAL%E5%BA%93%E5%AD%A6%E4%B9%A0%EF%BC%88macOS%EF%BC%89%EF%BC%885%EF%BC%89%E2%80%94%E2%80%94/STM32单片机HAL库学习（macOS）（5）——/时钟显示.jpg">
+<meta property="article:published_time" content="2021-01-21T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-07-07T13:48:34.671Z">
+<meta property="article:author" content="Chris">
+<meta property="article:tag" content="STM32">
+<meta property="article:tag" content="STM32cubeIDE">
+<meta property="article:tag" content="STM32 Project">
+<meta property="article:tag" content="RTC">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://chrisz-nju.github.io/Quark/2021/01/22/STM32%E5%8D%95%E7%89%87%E6%9C%BAHAL%E5%BA%93%E5%AD%A6%E4%B9%A0%EF%BC%88macOS%EF%BC%89%EF%BC%885%EF%BC%89%E2%80%94%E2%80%94/STM32单片机HAL库学习（macOS）（5）——/公式.png">
+
+<link rel="canonical" href="https://chrisz-nju.github.io/Quark/2021/01/22/STM32%E5%8D%95%E7%89%87%E6%9C%BAHAL%E5%BA%93%E5%AD%A6%E4%B9%A0%EF%BC%88macOS%EF%BC%89%EF%BC%885%EF%BC%89%E2%80%94%E2%80%94/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>STM32之HAL库学习——电子时钟项目（1） | Qurak</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/Quark/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Qurak</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Make Code Talk</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/Quark/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/Quark/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/Quark/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://chrisz-nju.github.io/Quark/2021/01/22/STM32%E5%8D%95%E7%89%87%E6%9C%BAHAL%E5%BA%93%E5%AD%A6%E4%B9%A0%EF%BC%88macOS%EF%BC%89%EF%BC%885%EF%BC%89%E2%80%94%E2%80%94/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/img/0df431adcbef76096e34ebdc26dda3cc7cd99eb1-20210706060646187.jpeg">
+      <meta itemprop="name" content="Chris">
+      <meta itemprop="description" content=""I hope that I am a pioneer and my efforts can bring better technology and things to everyone."">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qurak">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          STM32之HAL库学习——电子时钟项目（1）
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-22 00:00:00" itemprop="dateCreated datePublished" datetime="2021-01-22T00:00:00+08:00">2021-01-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-07-07 21:48:34" itemprop="dateModified" datetime="2021-07-07T21:48:34+08:00">2021-07-07</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/Quark/categories/STM32%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">STM32学习</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/Quark/categories/STM32%E5%AD%A6%E4%B9%A0/My-STM32-Project/" itemprop="url" rel="index"><span itemprop="name">My STM32 Project</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>——Jan.23.2021</p>
+<h2 id="目录"><a class="markdownIt-Anchor" href="#目录"></a> 目录</h2>
+<p>本次项目采用正点原子STM32F407探索者开发版和STM32cubeIDE软件开发</p>
+<ul>
+<li>STM32的RTC时钟功能简单介绍</li>
+<li>电子时钟项目计划</li>
+<li>开发过程、遇到的问题和解决方案</li>
+</ul>
+<span id="more"></span>
+<h2 id="一-stm32的rtc时钟功能简单介绍"><a class="markdownIt-Anchor" href="#一-stm32的rtc时钟功能简单介绍"></a> 一、STM32的RTC时钟功能简单介绍</h2>
+<h3 id="1rtc介绍"><a class="markdownIt-Anchor" href="#1rtc介绍"></a> （1）RTC介绍</h3>
+<p>RTC（Real-Time Clock）是一个独立的BCD计数器。RTC可以提供<strong>一个日历时钟</strong>，<strong>两个可编程闹钟中断</strong>以及一个具有中断功能的周期性可编程唤醒标志。</p>
+<p>在F407中的RTC功能是比较强大的，两个32位的寄存器包含了秒、分、小时、星期、日期、月份和年份（BCD表示）。还提供了二进制格式的亚秒值。系统可以自动将补偿闰年的天数，还可以进行夏令时的补偿。此外还可以用数字校准功能对晶振校准。</p>
+<p>⚠️：上电复位后，所有RTC寄存器都会收到保护，以防止可能的非正常写访问。无论什么情况下，只要电源保持在工作范围内，RTC便不会停止工作。</p>
+<h3 id="2功能说明"><a class="markdownIt-Anchor" href="#2功能说明"></a> （2）功能说明</h3>
+<p>最近刚开始接触STM32的RTC功能，在研究手册和相关教程的时候萌生了自制电子显示时钟的想法，我会把我的研究记录在这里，RTC功能相对较为丰富，建议找到官方的用户手册研究一下，这里我在用到特定功能的时候也会简要介绍一下。</p>
+<ul>
+<li>
+<p><strong>时钟树和预分频</strong>：RTC时钟源从LSE时钟、LSI振荡器时钟以及HSE时钟三者中选择。时钟的预分频分为两个可编程的预分频器，可以用<code>RTC_PRER</code>寄存器的<code>PREDIV_A</code>（7位异步与分频器）和<code>PREDIV_S</code>配置（15位同步预分频器）配置，但这边需要<strong>注意一点</strong>：如果同时用两个与分频器且需要最大程度较低功耗，推荐将异步预分频器配置为较高的值。各个分频的结果有：</p>
+  <img src="STM32单片机HAL库学习（macOS）（5）——/公式.png" alt="公式" style="zoom:50%;" />
+<p>其中f<sub>CK_Spre</sub>既可用于更新日历，也可以用做16位唤醒自动充装在定时器的时基。</p>
+</li>
+<li>
+<p><strong>实时时钟和日历</strong>：<code>RTC_SSR</code>对应亚秒,<code>RTC_TR</code>对应时间,<code>RTC_DR</code>对应日期。每隔<strong>两个RTCCLK</strong>周期，日历值就会复制到影子寄存器中，并将<code>RTC_ISR</code>寄存器的标志位RSF为1。在停机和待机模式下不会执行复制操作。推出这两种模式时，影子寄存器会2个RTCCLK周期内进行更新。读取日历寄存器时一般访问影子寄存器，但也可以设置<code>RTC_CR</code>的<code>BYPSHAD</code>控制位为1来直接访问日历里寄存器。同时，当<code>BYPSHAD</code>=0模式下读取数据，APB时钟频率至少为RTC时钟<strong>频率的7倍</strong>。一般正常配置时钟都会满足该要求。</p>
+</li>
+</ul>
+<h3 id="3寄存器"><a class="markdownIt-Anchor" href="#3寄存器"></a> （3）寄存器</h3>
+<p>完整的配置和注意要求可以参考中文手册。这里提一下几个重要的寄存器：</p>
+<ul>
+<li><strong>时间寄存器、日期寄存器(RTC_TR, RTC_DR)</strong>：初始化参数值以及设置格式，只能初始化的时候写操作。</li>
+<li><strong>控制寄存器(RTC_CR)</strong>：控制RTC内部的各个功能使能。</li>
+<li><strong>初始化和状态寄存器(RTC_ISR)</strong>：检测是否初始化以及检查当前状态。</li>
+<li><strong>预分频寄存器</strong>、<strong>写保护寄存器</strong>、<strong>校准寄存器</strong></li>
+</ul>
+<h3 id="4hal库函数说明"><a class="markdownIt-Anchor" href="#4hal库函数说明"></a> （4）HAL库函数说明</h3>
+<p>采用HAL库最大的优点在于许多基本操作已经帮你封装成一个个规整的函数，因此我们需要了解这些函数以及调用相应的函数就能实现<strong>大部分</strong>功能。下面介绍一下会用到的几个HAL库的函数。</p>
+<p>首先介绍一下时间和日期的结构体：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Time</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="keyword">uint8_t</span> Hours;            <span class="comment">/*!&lt; Specifies the RTC Time Hour.</span></span><br><span class="line"><span class="comment">                                 This parameter must be a number between Min_Data = 0 and Max_Data = 12 if the RTC_HourFormat_12 is selected.</span></span><br><span class="line"><span class="comment">                                 This parameter must be a number between Min_Data = 0 and Max_Data = 23 if the RTC_HourFormat_24 is selected  */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint8_t</span> Minutes;          <span class="comment">/*!&lt; Specifies the RTC Time Minutes.</span></span><br><span class="line"><span class="comment">                                 This parameter must be a number between Min_Data = 0 and Max_Data = 59 */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint8_t</span> Seconds;          <span class="comment">/*!&lt; Specifies the RTC Time Seconds.</span></span><br><span class="line"><span class="comment">                                 This parameter must be a number between Min_Data = 0 and Max_Data = 59 */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint8_t</span> TimeFormat;       <span class="comment">/*!&lt; Specifies the RTC AM/PM Time.</span></span><br><span class="line"><span class="comment">                                 This parameter can be a value of @ref RTC_AM_PM_Definitions */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint32_t</span> SubSeconds;     <span class="comment">/*!&lt; Specifies the RTC_SSR RTC Sub Second register content.</span></span><br><span class="line"><span class="comment">                                 This parameter corresponds to a time unit range between [0-1] Second</span></span><br><span class="line"><span class="comment">                                 with [1 Sec / SecondFraction +1] granularity */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint32_t</span> SecondFraction;  <span class="comment">/*!&lt; Specifies the range or granularity of Sub Second register content</span></span><br><span class="line"><span class="comment">                                 corresponding to Synchronous pre-scaler factor value (PREDIV_S)</span></span><br><span class="line"><span class="comment">                                 This parameter corresponds to a time unit range between [0-1] Second</span></span><br><span class="line"><span class="comment">                                 with [1 Sec / SecondFraction +1] granularity.</span></span><br><span class="line"><span class="comment">                                 This field will be used only by HAL_RTC_GetTime function */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint32_t</span> DayLightSaving;  <span class="comment">/*!&lt; Specifies DayLight Save Operation.</span></span><br><span class="line"><span class="comment">                                 This parameter can be a value of @ref RTC_DayLightSaving_Definitions */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint32_t</span> StoreOperation;  <span class="comment">/*!&lt; Specifies RTC_StoreOperation value to be written in the BCK bit</span></span><br><span class="line"><span class="comment">                                 in CR register to store the operation.</span></span><br><span class="line"><span class="comment">                                 This parameter can be a value of @ref RTC_StoreOperation_Definitions */</span></span><br><span class="line">&#125;RTC_TimeTypeDef;</span><br><span class="line"><span class="comment">// Date</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  <span class="keyword">uint8_t</span> WeekDay;  <span class="comment">/*!&lt; Specifies the RTC Date WeekDay.</span></span><br><span class="line"><span class="comment">                         This parameter can be a value of @ref RTC_WeekDay_Definitions */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint8_t</span> Month;    <span class="comment">/*!&lt; Specifies the RTC Date Month (in BCD format).</span></span><br><span class="line"><span class="comment">                         This parameter can be a value of @ref RTC_Month_Date_Definitions */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint8_t</span> Date;     <span class="comment">/*!&lt; Specifies the RTC Date.</span></span><br><span class="line"><span class="comment">                         This parameter must be a number between Min_Data = 1 and Max_Data = 31 */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint8_t</span> Year;     <span class="comment">/*!&lt; Specifies the RTC Date Year.</span></span><br><span class="line"><span class="comment">                         This parameter must be a number between Min_Data = 0 and Max_Data = 99 */</span></span><br><span class="line"></span><br><span class="line">&#125;RTC_DateTypeDef;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  * @brief  RTC Alarm structure definition</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">  RTC_TimeTypeDef AlarmTime;     <span class="comment">/*!&lt; Specifies the RTC Alarm Time members */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint32_t</span> AlarmMask;            <span class="comment">/*!&lt; Specifies the RTC Alarm Masks.</span></span><br><span class="line"><span class="comment">                                      This parameter can be a value of @ref RTC_AlarmMask_Definitions */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint32_t</span> AlarmSubSecondMask;   <span class="comment">/*!&lt; Specifies the RTC Alarm SubSeconds Masks.</span></span><br><span class="line"><span class="comment">                                      This parameter can be a value of @ref RTC_Alarm_Sub_Seconds_Masks_Definitions */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint32_t</span> AlarmDateWeekDaySel;  <span class="comment">/*!&lt; Specifies the RTC Alarm is on Date or WeekDay.</span></span><br><span class="line"><span class="comment">                                     This parameter can be a value of @ref RTC_AlarmDateWeekDay_Definitions */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint8_t</span> AlarmDateWeekDay;      <span class="comment">/*!&lt; Specifies the RTC Alarm Date/WeekDay.</span></span><br><span class="line"><span class="comment">                                      If the Alarm Date is selected, this parameter must be set to a value in the 1-31 range.</span></span><br><span class="line"><span class="comment">                                      If the Alarm WeekDay is selected, this parameter can be a value of @ref RTC_WeekDay_Definitions */</span></span><br><span class="line"></span><br><span class="line">  <span class="keyword">uint32_t</span> Alarm;                <span class="comment">/*!&lt; Specifies the alarm .</span></span><br><span class="line"><span class="comment">                                      This parameter can be a value of @ref RTC_Alarms_Definitions */</span></span><br><span class="line">&#125;RTC_AlarmTypeDef;</span><br></pre></td></tr></table></figure>
+<p>然后是读取时间和日期的函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** The first function is HAL_RTC_GetTime</span></span><br><span class="line"><span class="comment">  * @brief  Gets RTC current time.</span></span><br><span class="line"><span class="comment">  * @param  hrtc pointer to a RTC_HandleTypeDef structure that contains</span></span><br><span class="line"><span class="comment">  *                the configuration information for RTC.</span></span><br><span class="line"><span class="comment">  * @param  sTime Pointer to Time structure</span></span><br><span class="line"><span class="comment">  * @param  Format Specifies the format of the entered parameters.</span></span><br><span class="line"><span class="comment">  *          This parameter can be one of the following values:</span></span><br><span class="line"><span class="comment">  *            @arg RTC_FORMAT_BIN: Binary data format</span></span><br><span class="line"><span class="comment">  *            @arg RTC_FORMAT_BCD: BCD data format</span></span><br><span class="line"><span class="comment">  * @note  You can use SubSeconds and SecondFraction (sTime structure fields returned) to convert SubSeconds</span></span><br><span class="line"><span class="comment">  *        value in second fraction ratio with time unit following generic formula:</span></span><br><span class="line"><span class="comment">  *        Second fraction ratio * time_unit= [(SecondFraction-SubSeconds)/(SecondFraction+1)] * time_unit</span></span><br><span class="line"><span class="comment">  *        This conversion can be performed only if no shift operation is pending (ie. SHFP=0) when PREDIV_S &gt;= SS</span></span><br><span class="line"><span class="comment">  * @note You must call HAL_RTC_GetDate() after HAL_RTC_GetTime() to unlock the values</span></span><br><span class="line"><span class="comment">  *        in the higher-order calendar shadow registers to ensure consistency between the time and date values.</span></span><br><span class="line"><span class="comment">  *        Reading RTC current time locks the values in calendar shadow registers until current date is read.</span></span><br><span class="line"><span class="comment">  * @retval HAL status</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"><span class="function">HAL_StatusTypeDef <span class="title">HAL_RTC_GetTime</span><span class="params">(RTC_HandleTypeDef *hrtc, RTC_TimeTypeDef *sTime, <span class="keyword">uint32_t</span> Format)</span></span>;</span><br><span class="line"><span class="comment">/** The second function is HAL_RTC_GetDate</span></span><br><span class="line"><span class="comment">  * @brief  Gets RTC current date.</span></span><br><span class="line"><span class="comment">  * @param  hrtc pointer to a RTC_HandleTypeDef structure that contains</span></span><br><span class="line"><span class="comment">  *                the configuration information for RTC.</span></span><br><span class="line"><span class="comment">  * @param  sDate Pointer to Date structure</span></span><br><span class="line"><span class="comment">  * @param  Format Specifies the format of the entered parameters.</span></span><br><span class="line"><span class="comment">  *          This parameter can be one of the following values:</span></span><br><span class="line"><span class="comment">  *            @arg RTC_FORMAT_BIN:  Binary data format</span></span><br><span class="line"><span class="comment">  *            @arg RTC_FORMAT_BCD:  BCD data format</span></span><br><span class="line"><span class="comment">  * @note You must call HAL_RTC_GetDate() after HAL_RTC_GetTime() to unlock the values</span></span><br><span class="line"><span class="comment">  * in the higher-order calendar shadow registers to ensure consistency between the time and date values.</span></span><br><span class="line"><span class="comment">  * Reading RTC current time locks the values in calendar shadow registers until Current date is read.</span></span><br><span class="line"><span class="comment">  * @retval HAL status</span></span><br><span class="line"><span class="comment">  */</span></span><br><span class="line"><span class="function">HAL_StatusTypeDef <span class="title">HAL_RTC_GetDate</span><span class="params">(RTC_HandleTypeDef *hrtc, RTC_DateTypeDef *sDate, <span class="keyword">uint32_t</span> Format)</span></span></span><br></pre></td></tr></table></figure>
+<h2 id="二-电子时钟项目计划"><a class="markdownIt-Anchor" href="#二-电子时钟项目计划"></a> 二、电子时钟项目计划</h2>
+<h3 id="项目计划"><a class="markdownIt-Anchor" href="#项目计划"></a> 项目计划</h3>
+<p>在研究RTC的时候发现，教程入门基本结束了，然后萌生了制作一个自制电子时钟的想法，并列出了一些计划，之后会断断续续地续上更新（<s>如果我还没放弃的话233</s>)。</p>
+<p><img src="STM32%E5%8D%95%E7%89%87%E6%9C%BAHAL%E5%BA%93%E5%AD%A6%E4%B9%A0%EF%BC%88macOS%EF%BC%89%EF%BC%885%EF%BC%89%E2%80%94%E2%80%94/%E9%A1%B9%E7%9B%AE%E8%AE%A1%E5%88%92.png" alt="项目计划" /></p>
+<h3 id="step1显示时钟"><a class="markdownIt-Anchor" href="#step1显示时钟"></a> Step1:显示时钟</h3>
+<h3 id="1初始化配置"><a class="markdownIt-Anchor" href="#1初始化配置"></a> （1）初始化配置</h3>
+<p>新建一个Project，取名为“RTC Display”然后我们选择好芯片开始配置：</p>
+<ul>
+<li>
+<p><strong>显示模块</strong>：需要启用FSMC和PB15。（详情可参考上一个LCD显示教程）</p>
+</li>
+<li>
+<p><strong>RTC模块</strong>：需要启用内部低速晶振LSE选项，STM32F407中这个晶振的频率为32.768KHz。然后使能RTC的时钟源和日期。这里由于没有涉及到闹钟和唤醒，就不用使能闹钟和唤醒。查看下面设置<code>Configuration</code>可以设置参数。这里时间设置为我开始项目的日期。时间就暂时设置为12时00分00秒（24小时制）。</p>
+</li>
+<li>
+<p><strong>注意</strong>⚠️：这里建议将数值格式设置为二进制（Binary）方便后续数值调用和计算。</p>
+  <img src="STM32单片机HAL库学习（macOS）（5）——/LSE时钟源.png" alt="LSE时钟源" style="zoom:65%;" />
+<ul>
+<li>LSE设置</li>
+</ul>
+  <img src="STM32单片机HAL库学习（macOS）（5）——/时钟树配置.png" alt="时钟树配置" style="zoom:65%;" />
+<ul>
+<li>
+<p>时钟树设置</p>
+</li>
+<li>
+<p>RTC参数相关设置：</p>
+<ul>
+<li>其中异步分频和同步分频分别默认即可（32768 = (127+1) x (255+1) 是自动设置为 1Hz ）</li>
+<li>时间格式建议设置为二进制<code>Binary data format</code>，方便后面计算和输出。</li>
+<li>⚠️<strong>注意</strong>：这里设置参数的格式有十进制和十六进制和不检查<code>no check</code>，但是这里尝试了一下好像选择十进制和十六进制生成代码的时候都是默认16进制。这里建议选择<code>no check</code>然后直接输入十进制数即可。（PS：如果要写成16进制则要加前缀0x）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>然后就基本设置好了，我们点击<code>Generate Code</code>开始工程。</p>
+<h3 id="2显示模块导入"><a class="markdownIt-Anchor" href="#2显示模块导入"></a> （2）显示模块导入</h3>
+<p>在上一篇教程中有比较详细的示范（<s>缝合</s>），废话不多说，直接开始。</p>
+<ul>
+<li>
+<p>首先我们找到之前准备好的LCD驱动文件，我这边一共是三个：<code>lcd.c</code>, <code>lcd.h</code>, <code>font.h</code>然后复制到我们的工作去（workplace）中，在IDE中点击刷新即可看到我们新增的文件，这里我是放在MyFunction中。然后就是打开工程设置，找到路径选项，在编译路径中将LCD的文件夹添加，然后点击源文件（source）再将<code>lcd.c</code>添加。</p>
+</li>
+<li>
+<p>然后我们在初始化的位置添加LCD初始化函数<code>LCD_Init()</code>，点击编译看是否已经完成导入。若没有报错就说明可以用了。我们就可以调用驱动中的函数进行显示了。</p>
+  <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Initialize all configured peripherals */</span></span><br><span class="line"> MX_GPIO_Init();</span><br><span class="line"> MX_FSMC_Init();</span><br><span class="line"> MX_RTC_Init();</span><br><span class="line"> <span class="comment">/* USER CODE BEGIN 2 */</span></span><br><span class="line">LCD_Init();				<span class="comment">//LCD初始化函数</span></span><br><span class="line"><span class="comment">/* USER CODE END 2 */</span></span><br></pre></td></tr></table></figure>
+</li>
+<li>
+<p>PS：如果想要在单片机上看到效果，还需要打开背光源PB15引脚输出高电平才可以。因此要添加一句<code>HAL_GPIO_WritePin(GPIOB,GPIO_PIN_15,GPIO_PIN_SET);</code></p>
+<p>后来想了想，考虑到目前只用这个单片机以及今后方便，我们可以直接在<code>LCD_Init()</code>中，在最后几行的位置将本来被注释掉打开背光代码替换为HAL库函数形式，这样以后就不用在初始化后再加一个<code>HAL_GPIO_WritePin</code>了。</p>
+  <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">LCD_Display_Dir(<span class="number">0</span>);		<span class="comment">//1为横屏，0为竖屏</span></span><br><span class="line"><span class="comment">//LCD_LED=1;				//点亮背光</span></span><br><span class="line">HAL_GPIO_WritePin(GPIOB,GPIO_PIN_15,GPIO_PIN_SET);	<span class="comment">//替换后的代码</span></span><br><span class="line">LCD_Clear(WHITE);</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h3 id="3rtc时钟获取和显示"><a class="markdownIt-Anchor" href="#3rtc时钟获取和显示"></a> （3）RTC时钟获取和显示</h3>
+<p>生成完代码后，我们可以在<code>main.c</code>中检查RTC初始化函数<code>MX_RTC_Init()</code>看是否参数初始化正确。检查无误即可开始本次时钟显示的核心函数调用：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//代码自动生成的句柄 hrtc</span></span><br><span class="line">RTC_HandleTypeDef  hrtc;</span><br><span class="line"><span class="comment">//我们定义的两个变量，为了方便后续的显示更新设置为全局变量time和date</span></span><br><span class="line"><span class="keyword">static</span> RTC_TimeTypeDef  time;</span><br><span class="line"><span class="keyword">static</span> RTC_DateTypeDef  date;</span><br><span class="line"><span class="comment">//需要调用的函数</span></span><br><span class="line">HAL_RTC_GetTime(&amp;hrtc, &amp;time, RTC_FORMAT_BIN);</span><br><span class="line">HAL_RTC_GetDate(&amp;hrtc, &amp;date, RTC_FORMAT_BIN);</span><br><span class="line"><span class="comment">/** 其中需要注意两点</span></span><br><span class="line"><span class="comment">  * 1、为了确保获取值的准确性，在调用GetDate之前必须先调用GetTime才可以，这个在函数说明中有提到。</span></span><br><span class="line"><span class="comment">  * 2、注意获取的格式为二进制RTC_FORMAT_BIN，这样数据格式才不会混淆</span></span><br><span class="line"><span class="comment">  */</span></span><br></pre></td></tr></table></figure>
+<h2 id="实现方案"><a class="markdownIt-Anchor" href="#实现方案"></a> 实现方案</h2>
+<p>根据对项目和单片机的理解，一开始对时钟显示有几个方案</p>
+<ul>
+<li>利用唤醒（wakeup）功能实现秒中断，在中断服务函数中重新获取time和date的值然后再输出显示。</li>
+<li>利用大循环while(1)进行快速刷新，然后以较快的频率检测时间，并保存到time和date中，最后在进行快速刷新显示。</li>
+<li>在大循环中采用<code>HAL_Delay(1000)</code>函数实现每秒检测。</li>
+</ul>
+<p>其中方案一每秒中断获取时间是可行的，但是通过中断服务函数来进行显示可能会导致显示的时间稍有延迟（显示读写显存需要一定时间）以及考虑到后续添加功能需要区分中断优先级，可能对未来有影响，因此暂时不采用；而方案二采用快速刷新的手段，加上全局变量改变参数time和date，虽然相比于方案一对CPU占用较大，但是目前来说CPU也挺闲的~~（不是）~~影响不大；至于方案三，由于<code>HAL_Delay()</code>函数的时基是由系统时钟所决定的，因此在定时的时候并没有专业的RTC来的高精度高稳定性以及自动校准补偿功能，时间相对粗略，并不合适。综合考虑，采用方案二。</p>
+<p>为了让代码结构比较简洁，我设置了一个显示函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//在固定范围刷新显示</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">UpdateDisplay</span><span class="params">(RTC_TimeTypeDef t, RTC_DateTypeDef d)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	LCD_ShowNum(<span class="number">50</span>, <span class="number">150</span>, d.Year + <span class="number">2000</span>, <span class="number">4</span>, <span class="number">24</span>);</span><br><span class="line">	LCD_ShowNum(<span class="number">125</span>, <span class="number">150</span>, d.Month, <span class="number">2</span>, <span class="number">24</span>);</span><br><span class="line">	LCD_ShowNum(<span class="number">175</span>, <span class="number">150</span>, d.Date, <span class="number">2</span>, <span class="number">24</span>);</span><br><span class="line">	LCD_ShowNum(<span class="number">50</span>, <span class="number">200</span>, t.Hours, <span class="number">2</span>, <span class="number">24</span>);</span><br><span class="line">	LCD_ShowNum(<span class="number">100</span>, <span class="number">200</span>, t.Minutes, <span class="number">2</span>, <span class="number">24</span>);</span><br><span class="line">	LCD_ShowNum(<span class="number">150</span>, <span class="number">200</span>, t.Seconds, <span class="number">2</span>, <span class="number">24</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后在大循环中调用</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">/* Infinite loop */</span></span><br><span class="line"> <span class="comment">/* USER CODE BEGIN WHILE */</span></span><br><span class="line"><span class="keyword">while</span> (<span class="number">1</span>) &#123;</span><br><span class="line">   <span class="comment">/* USER CODE END WHILE */</span></span><br><span class="line"></span><br><span class="line">   <span class="comment">/* USER CODE BEGIN 3 */</span></span><br><span class="line">	UpdateDisplay(time,date);		<span class="comment">//刷新显示内容</span></span><br><span class="line">	HAL_RTC_GetTime(&amp;hrtc, &amp;time, RTC_FORMAT_BIN);	<span class="comment">//更新time的值</span></span><br><span class="line">	HAL_RTC_GetDate(&amp;hrtc, &amp;date, RTC_FORMAT_BIN);	<span class="comment">//更新date的值</span></span><br><span class="line">	HAL_Delay(<span class="number">50</span>);	<span class="comment">//延时50毫秒，屏幕刷新率为20Hz</span></span><br><span class="line">&#125;</span><br><span class="line"> <span class="comment">/* USER CODE END 3 */</span></span><br></pre></td></tr></table></figure>
+<p>最后的成果，主要参数都能正确的显示，刷新也很流畅。而且很显然，只需要再加入<strong>亿</strong>点细节就可以了～（笑哭</p>
+<img src="STM32单片机HAL库学习（macOS）（5）——/时钟显示.jpg" alt="时钟显示" style="zoom:30%;" />
+<p>最后通过手机的秒表功能辅助验证计时是否准确。</p>
+<h2 id="三-开发过程遇到的问题和解决方案"><a class="markdownIt-Anchor" href="#三-开发过程遇到的问题和解决方案"></a> 三、开发过程遇到的问题和解决方案</h2>
+<ul>
+<li><strong>保存格式错误产生的显示错误</strong>：保存格式应为二进制形式，如果保存为BCD码格式，则读取时间后仍是BCD码形式但是处理器仍是以二进制形式进行处理，导致数字显示不对。同时<code>GetTime</code>和<code>GetDate</code>两个函数的读取格式也应该设置为<code>RTC_FORMAT_BIN</code>。我设置完初始化格式为二进制后忘了设置读入格式，导致最后显示仍为不正确的。</li>
+<li><strong>时钟源选择不正确</strong>：时钟一定要用内部晶振LSE，如果采用振荡电路产生的32K时钟信号，时钟是不稳定的。实际测试下来每20秒会慢4秒左右。所以首先要在RCC中打开LSE，然后在时钟树中将RTC时钟源设置为LSE。</li>
+<li><strong>显示写入操作逻辑不正确</strong>：在流畅显示时一开始以为LCD写入显存会叠加，所以每次更新前都会调用函数<code>LCD_Clear(WHITE)</code>清空屏幕，再显示新的内容，但是这样做会明显加重CPU负担，导致屏幕更新间隔卡顿十分明显，闪烁的显示令人不适。后来仔细研究了一下显存和显示，发现写入显存是覆盖的操作，因此只需要在同个位置写入新的符号，就会替换掉原先的符号，所以应该把清空屏幕的<code>LCD_Clear(WHITE)</code>函数去掉，这样即便是20Hz的刷新率，时间变化显示也是很流畅的。如果为了降低功耗可以进一步降低频率。</li>
+<li><strong>复位和开机程序错误</strong>：一般情况下，我们下载好程序之后单片机断电和复位后仍可以重新开始。但是在实际操作的时候发现了按下复位或者断电重启之后，程序会陷入一个混沌状态。最后上网查询资料发现可能是因为复位和重启后，软硬件初始化还没有完全稳定，直接进入程序可能会导致配置不正确。在程序的开头增加一个延时10ms左右即可解决问题，但不知道是否还有其他解决方法。</li>
+</ul>
+<p><strong>总结一下</strong>，这次试一次全新的尝试，以前都是跟着教程或者网上现成的代码配置照抄一下就好了，这次却是从一个小项目的想法开始，然后去网上收集许多的资料，再通过阅读芯片的用户手册来配置引脚。从上次的LCD显示开始，编写程序和引脚配置更多的需要自己的对于单片机的理解和判断，以及程序也需要自己从无到有的编写。许多方案都可以实现的情况下需要一个个去尝试和修改，最终选择出一个适合自己的方案。我认为这种模式下的学习效率似乎会更高一点，虽然辛苦了一点，但是总体来说还是十分有趣的。</p>
+<p>后续还会继续按照计划增加新的功能……敬请期待~~（咕咕咕）~~</p>
+<hr />
+<p>END</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/Quark/tags/STM32/" rel="tag"># STM32</a>
+              <a href="/Quark/tags/STM32cubeIDE/" rel="tag"># STM32cubeIDE</a>
+              <a href="/Quark/tags/STM32-Project/" rel="tag"># STM32 Project</a>
+              <a href="/Quark/tags/RTC/" rel="tag"># RTC</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Quark/2020/12/21/STM32%E5%8D%95%E7%89%87%E6%9C%BAHAL%E5%BA%93%E5%AD%A6%E4%B9%A0%EF%BC%88macOS%EF%BC%89%EF%BC%884%EF%BC%89%E2%80%94%E2%80%94LCD%E6%98%BE%E7%A4%BA/" rel="prev" title="STM32单片机HAL库学习MacOS（4）——LCD显示">
+      <i class="fa fa-chevron-left"></i> STM32单片机HAL库学习MacOS（4）——LCD显示
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/Quark/2021/02/21/STM32%E5%8D%95%E7%89%87%E6%9C%BAHAL%E5%BA%93%E5%AD%A6%E4%B9%A0%EF%BC%88macOS%EF%BC%89%EF%BC%885%EF%BC%89%E2%80%94%E2%80%94I2C%E9%80%9A%E4%BF%A1/" rel="next" title="STM32单片机HAL库学习MacOS(5)——I2C通信">
+      STM32单片机HAL库学习MacOS(5)——I2C通信 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text"> 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80-stm32%E7%9A%84rtc%E6%97%B6%E9%92%9F%E5%8A%9F%E8%83%BD%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.</span> <span class="nav-text"> 一、STM32的RTC时钟功能简单介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1rtc%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.1.</span> <span class="nav-text"> （1）RTC介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E5%8A%9F%E8%83%BD%E8%AF%B4%E6%98%8E"><span class="nav-number">2.2.</span> <span class="nav-text"> （2）功能说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%E5%AF%84%E5%AD%98%E5%99%A8"><span class="nav-number">2.3.</span> <span class="nav-text"> （3）寄存器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4hal%E5%BA%93%E5%87%BD%E6%95%B0%E8%AF%B4%E6%98%8E"><span class="nav-number">2.4.</span> <span class="nav-text"> （4）HAL库函数说明</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C-%E7%94%B5%E5%AD%90%E6%97%B6%E9%92%9F%E9%A1%B9%E7%9B%AE%E8%AE%A1%E5%88%92"><span class="nav-number">3.</span> <span class="nav-text"> 二、电子时钟项目计划</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%B9%E7%9B%AE%E8%AE%A1%E5%88%92"><span class="nav-number">3.1.</span> <span class="nav-text"> 项目计划</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#step1%E6%98%BE%E7%A4%BA%E6%97%B6%E9%92%9F"><span class="nav-number">3.2.</span> <span class="nav-text"> Step1:显示时钟</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1%E5%88%9D%E5%A7%8B%E5%8C%96%E9%85%8D%E7%BD%AE"><span class="nav-number">3.3.</span> <span class="nav-text"> （1）初始化配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%E6%98%BE%E7%A4%BA%E6%A8%A1%E5%9D%97%E5%AF%BC%E5%85%A5"><span class="nav-number">3.4.</span> <span class="nav-text"> （2）显示模块导入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3rtc%E6%97%B6%E9%92%9F%E8%8E%B7%E5%8F%96%E5%92%8C%E6%98%BE%E7%A4%BA"><span class="nav-number">3.5.</span> <span class="nav-text"> （3）RTC时钟获取和显示</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%A1%88"><span class="nav-number">4.</span> <span class="nav-text"> 实现方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89-%E5%BC%80%E5%8F%91%E8%BF%87%E7%A8%8B%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98%E5%92%8C%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">5.</span> <span class="nav-text"> 三、开发过程遇到的问题和解决方案</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Chris"
+      src="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/img/0df431adcbef76096e34ebdc26dda3cc7cd99eb1-20210706060646187.jpeg">
+  <p class="site-author-name" itemprop="name">Chris</p>
+  <div class="site-description" itemprop="description">"I hope that I am a pioneer and my efforts can bring better technology and things to everyone."</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/Quark/archives/">
+        
+          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/Quark/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/Quark/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/chrisz-nju" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;chrisz-nju" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/Quark/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/Quark/lib/anime.min.js"></script>
+  <script src="/Quark/lib/velocity/velocity.min.js"></script>
+  <script src="/Quark/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/Quark/js/utils.js"></script>
+
+<script src="/Quark/js/motion.js"></script>
+
+
+<script src="/Quark/js/schemes/muse.js"></script>
+
+
+<script src="/Quark/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
