@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"chrisz-nju.github.io","root":"/Quark/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":240,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="目录 [TOC]  我与 STM32CubeIDE 最开始学习 STM32 是用 Keil 的开发方式，但是由于我的 MacOS 无法安装 Keil 因此尝试去寻找替代的软件，阴差阳错找到了 ST 公司推出的 STM32CubeIDE。深入了解一番后发现 STM32CubeIDE 继承了 STM32CubeMX 的可视化快速配置，并且淘汰了传统的标准库，取而代之的 HAL 库则是将硬件抽象化，方">
+  <meta name="description" content="目录  我与 STM32CubeIDE STM32CubeIDE 安装 STM32CubeIDE 配置介绍 *STM32CubeIDE 进阶配置 STM32CubeIDE 编程，编译以及烧录 *STM32CubeIDE 中 FreeRTOS 的导入">
 <meta property="og:type" content="article">
 <meta property="og:title" content="STM32CubeIDE 自制使用指南">
 <meta property="og:url" content="https://chrisz-nju.github.io/Quark/2021/08/15/STM32CubeIDE%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/index.html">
 <meta property="og:site_name" content="Qurak">
-<meta property="og:description" content="目录 [TOC]  我与 STM32CubeIDE 最开始学习 STM32 是用 Keil 的开发方式，但是由于我的 MacOS 无法安装 Keil 因此尝试去寻找替代的软件，阴差阳错找到了 ST 公司推出的 STM32CubeIDE。深入了解一番后发现 STM32CubeIDE 继承了 STM32CubeMX 的可视化快速配置，并且淘汰了传统的标准库，取而代之的 HAL 库则是将硬件抽象化，方">
+<meta property="og:description" content="目录  我与 STM32CubeIDE STM32CubeIDE 安装 STM32CubeIDE 配置介绍 *STM32CubeIDE 进阶配置 STM32CubeIDE 编程，编译以及烧录 *STM32CubeIDE 中 FreeRTOS 的导入">
 <meta property="og:locale">
 <meta property="og:image" content="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/image-20210815163516277.png">
 <meta property="og:image" content="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/image-20210815163906285.png">
@@ -40,7 +40,7 @@
 <meta property="og:image" content="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/image-20210815192252856.png">
 <meta property="og:image" content="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/image-20210815211852581.png">
 <meta property="article:published_time" content="2021-08-14T16:00:00.000Z">
-<meta property="article:modified_time" content="2021-08-15T16:18:35.712Z">
+<meta property="article:modified_time" content="2021-08-15T16:23:02.827Z">
 <meta property="article:author" content="Chris">
 <meta property="article:tag" content="STM32CubeIDE">
 <meta name="twitter:card" content="summary">
@@ -204,7 +204,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2021-08-16 00:18:35" itemprop="dateModified" datetime="2021-08-16T00:18:35+08:00">2021-08-16</time>
+                <time title="Modified: 2021-08-16 00:23:02" itemprop="dateModified" datetime="2021-08-16T00:23:02+08:00">2021-08-16</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -228,7 +228,15 @@
 
       
         <h2 id="目录"><a class="markdownIt-Anchor" href="#目录"></a> 目录</h2>
-<p>[TOC]</p>
+<ul>
+<li>我与 STM32CubeIDE</li>
+<li>STM32CubeIDE 安装</li>
+<li>STM32CubeIDE 配置介绍</li>
+<li>*STM32CubeIDE 进阶配置</li>
+<li>STM32CubeIDE 编程，编译以及烧录</li>
+<li>*STM32CubeIDE 中 FreeRTOS 的导入</li>
+</ul>
+<span id="more"></span>
 <h2 id="我与-stm32cubeide"><a class="markdownIt-Anchor" href="#我与-stm32cubeide"></a> 我与 STM32CubeIDE</h2>
 <p>最开始学习 STM32 是用 Keil 的开发方式，但是由于我的 MacOS 无法安装 Keil 因此尝试去寻找替代的软件，阴差阳错找到了 ST 公司推出的 STM32CubeIDE。深入了解一番后发现 STM32CubeIDE 继承了 STM32CubeMX 的可视化快速配置，并且淘汰了传统的标准库，取而代之的 HAL 库则是将硬件抽象化，方便不同芯片类型的移植，因此整个编程的重新从硬件配置逐渐转移到专注于软件功能和算法的实现。</p>
 <p>虽然对于像我一样的小白而言，IDE 提供的编程体验还是比较简单容易上手的，但是相应的缺点是国内的相关的系统性的资料挺少的，遇到问题只能去各大论坛网站和个人博客中去寻找解决方法。我在这个过程中前前后后走了许多弯路，创立博客之初既是为了总结归纳所学的东西，也是希望其他人能够避免走我走过的弯路。</p>
