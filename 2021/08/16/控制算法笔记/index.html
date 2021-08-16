@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/Quark/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/Quark/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/Quark/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/Quark/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/Quark/css/main.css">
+
+
+<link rel="stylesheet" href="/Quark/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"chrisz-nju.github.io","root":"/Quark/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":240,"display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="目录  PID 控制算法 未完待续……">
+<meta property="og:type" content="article">
+<meta property="og:title" content="控制算法笔记">
+<meta property="og:url" content="https://chrisz-nju.github.io/Quark/2021/08/16/%E6%8E%A7%E5%88%B6%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/index.html">
+<meta property="og:site_name" content="Qurak">
+<meta property="og:description" content="目录  PID 控制算法 未完待续……">
+<meta property="og:locale">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/4/40/Pid-feedback-nct-int-correct.png">
+<meta property="og:image" content="c:/Users/庄嘉鑫/Desktop/PID_Matlab_Image/PID_Matlab_1.jpg">
+<meta property="og:image" content="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/PID_Matlab_2.jpg">
+<meta property="og:image" content="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/PID_Matlab_3.jpg">
+<meta property="og:image" content="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/PID_Matlab_4.jpg">
+<meta property="og:image" content="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/PID_Compensation_Animated.gif">
+<meta property="article:published_time" content="2021-08-15T16:00:00.000Z">
+<meta property="article:modified_time" content="2021-08-16T17:11:37.670Z">
+<meta property="article:author" content="Chris">
+<meta property="article:tag" content="Algorithm">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://upload.wikimedia.org/wikipedia/commons/4/40/Pid-feedback-nct-int-correct.png">
+
+<link rel="canonical" href="https://chrisz-nju.github.io/Quark/2021/08/16/%E6%8E%A7%E5%88%B6%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-Hans'
+  };
+</script>
+
+  <title>控制算法笔记 | Qurak</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --></head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/Quark/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Qurak</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Make Code Talk</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/Quark/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/Quark/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/Quark/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
+    <link itemprop="mainEntityOfPage" href="https://chrisz-nju.github.io/Quark/2021/08/16/%E6%8E%A7%E5%88%B6%E7%AE%97%E6%B3%95%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/img/0df431adcbef76096e34ebdc26dda3cc7cd99eb1-20210706060646187.jpeg">
+      <meta itemprop="name" content="Chris">
+      <meta itemprop="description" content=""I hope that I am a pioneer and my efforts can bring better technology and things to everyone."">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Qurak">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          控制算法笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-08-16 00:00:00" itemprop="dateCreated datePublished" datetime="2021-08-16T00:00:00+08:00">2021-08-16</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2021-08-17 01:11:37" itemprop="dateModified" datetime="2021-08-17T01:11:37+08:00">2021-08-17</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/Quark/categories/Control-Algorithm/" itemprop="url" rel="index"><span itemprop="name">Control Algorithm</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="目录"><a class="markdownIt-Anchor" href="#目录"></a> 目录</h2>
+<ul>
+<li>PID 控制算法</li>
+<li>未完待续……</li>
+</ul>
+<span id="more"></span>
+<h2 id="pid-控制算法"><a class="markdownIt-Anchor" href="#pid-控制算法"></a> PID 控制算法</h2>
+<h3 id="pid-算法介绍"><a class="markdownIt-Anchor" href="#pid-算法介绍"></a> PID 算法介绍</h3>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>u</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>k</mi><mi>p</mi></msub><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>k</mi><mi>i</mi></msub><msubsup><mo>∫</mo><mn>0</mn><mi>t</mi></msubsup><mi>e</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mi>d</mi><mi>τ</mi><mo>+</mo><msub><mi>k</mi><mi>d</mi></msub><mfrac><mi>d</mi><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">u(t)=k_{p}e(t)+k_{i}\int^{t}_{0}e(\tau)d{\tau}+k_{d}\frac{d}{dt}e(t)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">u</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.036108em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:-0.03148em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mord mathdefault">e</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:2.455406em;vertical-align:-0.9119499999999999em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.03148em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mop"><span class="mop op-symbol large-op" style="margin-right:0.44445em;position:relative;top:-0.0011249999999999316em;">∫</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.5434560000000002em;"><span style="top:-1.7880500000000001em;margin-left:-0.44445em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span><span style="top:-3.8129000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9119499999999999em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">e</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.1132em;">τ</span><span class="mclose">)</span><span class="mord mathdefault">d</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.1132em;">τ</span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:-0.03148em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">d</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">d</span><span class="mord mathdefault">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord mathdefault">e</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span></span></span></span></span></p>
+<p>PID 算法的名字就是由它的控制方式来的，P-Proportion 比例单元，I-Integral 积分单元，D-Derivative 微分单元，所以 PID 也叫做 “比例-积分-微分控制算法”。PID 主要适用于基本上线性，且动态特性不随时间变化的系统（也就是 <strong>线性时不变系统</strong>）</p>
+<p>从结构上来看，PID 控制本质上就是一个反馈调节的过程，根据实际输出与预设的误差来动态调节。根据误差进行了比例，积分和微分三种调节，对应的参数是 kp，ki，kd。PID 的性能几乎取决于这三个参数的设置，因此调节这三个参数是整个算法最重要的。由于不同的系统对应的参数不尽相同，所以这三个参数需要根据实际情况来调节。</p>
+<img src="https://upload.wikimedia.org/wikipedia/commons/4/40/Pid-feedback-nct-int-correct.png" alt="img" style="zoom:40%;" />
+<p>上面给出了 PID 数学表达，当我们在编程的时候，更多的时候需要将连续转化为离散的形式，根据定义我们可以得到离散形式的 PID 表达：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>u</mi><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo><mo>=</mo><msub><mi>k</mi><mi>p</mi></msub><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>k</mi><mi>i</mi></msub><munderover><mo>∑</mo><mrow><mi>n</mi><mo>=</mo><mn>0</mn></mrow><mi>k</mi></munderover><mi>e</mi><mo stretchy="false">(</mo><mi>n</mi><mo stretchy="false">)</mo><mo>+</mo><msub><mi>k</mi><mi>d</mi></msub><mo stretchy="false">[</mo><mi>e</mi><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo><mo>−</mo><mi>e</mi><mo stretchy="false">(</mo><mi>k</mi><mo>−</mo><mn>1</mn><mo stretchy="false">)</mo><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">u(k)=k_{p}e(t)+k_{i}\sum^{k}_{n=0}e(n)+k_{d}[e(k)-e(k-1)]
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">u</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.036108em;vertical-align:-0.286108em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:-0.03148em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">p</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mord mathdefault">e</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:3.1032260000000003em;vertical-align:-1.267113em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.03148em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8361130000000003em;"><span style="top:-1.882887em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">n</span><span class="mrel mtight">=</span><span class="mord mtight">0</span></span></span></span><span style="top:-3.050005em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3000050000000005em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.267113em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">e</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:-0.03148em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">d</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">[</span><span class="mord mathdefault">e</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">e</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mclose">]</span></span></span></span></span></p>
+<p>其实，如果熟悉信号与系统或者数字信号处理，PID 控制器还可以认为是一种滤波器，它的系统函数可以由上面给出的差分形式通过拉普拉斯变换得到：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>H</mi><mo stretchy="false">(</mo><mi>s</mi><mo stretchy="false">)</mo><mo>=</mo><mfrac><mrow><msub><mi>k</mi><mi>d</mi></msub><msup><mi>s</mi><mn>2</mn></msup><mo>+</mo><msub><mi>k</mi><mi>p</mi></msub><mi>s</mi><mo>+</mo><msub><mi>k</mi><mi>i</mi></msub></mrow><mrow><mi>s</mi><mo>+</mo><mi>C</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">H(s)=\frac{k_{d}s^{2}+k_ps+k_{i}}{s+C}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.08125em;">H</span><span class="mopen">(</span><span class="mord mathdefault">s</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.2604379999999997em;vertical-align:-0.7693300000000001em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.4911079999999999em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">s</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:-0.03148em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">d</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathdefault">s</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141079999999999em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.15139200000000003em;"><span style="top:-2.5500000000000003em;margin-left:-0.03148em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.286108em;"><span></span></span></span></span></span></span><span class="mord mathdefault">s</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.03148em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7693300000000001em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p>其中，C 是取决于系统带宽的常熟。因此，如果数值挑选不当，容易产生输出的自激震荡而不稳定，此时系统将永远无法达到期望的预设值。</p>
+<p>下面具体介绍一下 PID 中 P，I 和 D 控制的含义。</p>
+<h3 id="比例控制proportion-control"><a class="markdownIt-Anchor" href="#比例控制proportion-control"></a> 比例控制（Proportion-Control）</h3>
+<p>比例控制为主要的减小误差方式，根据当前输出与预设值，乘上一定的比例后来调节输出。</p>
+<p>我们可以假设有一个水池，我们需要动态调节水位保持在 1m 的深度。这时我们控制的对象（Process）为水阀下次需要加多少水。根据传感器我们可以知道当前的水位 0.2m，因此我们就可以计算出当前的误差 e = 1 - 0.2 = 0.8m。这里我们采用比例调节加水，假设当前比例 kp 为 0.5，我们得到比例控制的输出为 0.8*0.5 = 0.4 m。经过控制器（Process）得到第一次调节后的水位为 0.2 + 0.4 = 0.6m，以此类推。我们推出最后的水位将会无限接近我的预设 1m，在一定精度下可以认为达到预设的 1m 水位。下面采用 Matlab 来简单模拟一下水位的变化：</p>
+<img src="C:\Users\庄嘉鑫\Desktop\PID_Matlab_Image\PID_Matlab_1.jpg" alt="PID_Matlab_1" style="zoom:80%;" />
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">%% Proportion-Control-ideal</span></span><br><span class="line">clear;</span><br><span class="line"><span class="comment">%% 初始化 %%</span></span><br><span class="line">N = <span class="number">100</span>;   <span class="comment">% 离散时间</span></span><br><span class="line">n = <span class="number">1</span>:<span class="number">1</span>:N;</span><br><span class="line">target = <span class="number">100</span>;                      <span class="comment">% 目标</span></span><br><span class="line">start = <span class="number">20</span>;                           <span class="comment">% 初始值</span></span><br><span class="line">r = target*<span class="built_in">ones</span>(<span class="number">1</span>,N);         <span class="comment">% 目标参考</span></span><br><span class="line">u = <span class="built_in">zeros</span>(<span class="number">1</span>,N);        <span class="comment">% 实际输出</span></span><br><span class="line">error = <span class="built_in">zeros</span>(<span class="number">1</span>,N);            <span class="comment">% 误差</span></span><br><span class="line">e_sum = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">%% PID 参数</span></span><br><span class="line">kp  = <span class="number">0.5</span>;</span><br><span class="line">ki   = <span class="number">0</span>;</span><br><span class="line">kd  = <span class="number">0</span>;</span><br><span class="line">miss = <span class="number">0</span>;    <span class="comment">% 每次输出减去固定的误差，以形成稳态误差</span></span><br><span class="line"></span><br><span class="line"><span class="comment">%% PID 算法</span></span><br><span class="line"><span class="comment">% 初始化</span></span><br><span class="line">u(<span class="number">1</span>) = start;</span><br><span class="line">error(<span class="number">2</span>) = target - u(<span class="number">1</span>);</span><br><span class="line">e_sum = e_sum + error(<span class="number">2</span>);</span><br><span class="line">de = error(<span class="number">2</span>)-error(<span class="number">1</span>);</span><br><span class="line">u(<span class="number">2</span>) = kp*error(<span class="number">2</span>)+ki*e_sum+kd*de + u(<span class="number">1</span>) - miss;</span><br><span class="line"><span class="comment">% PID 调节</span></span><br><span class="line"><span class="keyword">for</span> k = <span class="number">3</span>:<span class="number">1</span>:N</span><br><span class="line">    error(k) = target - u(k<span class="number">-1</span>);</span><br><span class="line">    e_sum = e_sum + error(k);</span><br><span class="line">    de = error(k)-error(k<span class="number">-1</span>);</span><br><span class="line">    u(k) = kp*error(k)+ki*e_sum+kd*de+u(k<span class="number">-1</span>) - miss;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">%% 绘图显示结果</span></span><br><span class="line"><span class="built_in">figure</span>;</span><br><span class="line"><span class="built_in">plot</span>(n, r, <span class="string">&#x27;-.&#x27;</span>);</span><br><span class="line"><span class="built_in">hold</span> on;</span><br><span class="line"><span class="built_in">plot</span>(n, u,<span class="string">&#x27;--&#x27;</span>);</span><br><span class="line"><span class="built_in">legend</span>(<span class="string">&quot;target&quot;</span>, <span class="string">&quot;present&quot;</span>);</span><br><span class="line">xlabel(<span class="string">&quot;离散时间 n&quot;</span>);</span><br><span class="line">ylabel(<span class="string">&quot;水位/cm&quot;</span>);</span><br><span class="line">ylim([<span class="number">0</span>,<span class="number">120</span>]);</span><br><span class="line">title(<span class="string">&quot;PID 水位控制&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>这个时候读者难免会有疑惑，既然比例调节就可以比很快的调节到预设值，那么为什么还要引入积分和微分的控制，这不是会增加算法复杂度和调参的复杂度吗？其实这是因为这里所设置的场景是一个非常理想的情况，然而实际上我们需要考虑水池是否会漏水，水阀防水量存在精度误差……一系列问题，这些考虑实际情况产生的误差我们可以合起来认为是总误差 miss。</p>
+<p>这里我们再次利用上面的例子，我们假设上面水池系统的总误差 miss = 10，即每次加水后都会少掉 10 cm = 0.1m，由于我们的比例控制只看当前的输出和预设值的误差，因此当 kp*e = miss 的时候，我们会发现我们控制水阀加水的量等于损失的量，此时水阀还在放水，但是水位已经不会变化了。我们把这个稳定的误差称为 <strong>稳态误差</strong>。下面是 Matlab 模拟的水位变化：</p>
+<img src="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/PID_Matlab_2.jpg" alt="PID_Matlab_2" style="zoom:80%;" />
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">% Proportion-Control-miss</span></span><br><span class="line">clear;</span><br><span class="line"><span class="comment">%% 初始化 %%</span></span><br><span class="line">N = <span class="number">100</span>;   <span class="comment">% 离散时间</span></span><br><span class="line">n = <span class="number">1</span>:<span class="number">1</span>:N;</span><br><span class="line">target = <span class="number">100</span>;                      <span class="comment">% 目标</span></span><br><span class="line">start = <span class="number">20</span>;                           <span class="comment">% 初始值</span></span><br><span class="line">r = target*<span class="built_in">ones</span>(<span class="number">1</span>,N);         <span class="comment">% 目标参考</span></span><br><span class="line">u = <span class="built_in">zeros</span>(<span class="number">1</span>,N);        <span class="comment">% 实际输出</span></span><br><span class="line">error = <span class="built_in">zeros</span>(<span class="number">1</span>,N);            <span class="comment">% 误差</span></span><br><span class="line">e_sum = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">%% PID 参数</span></span><br><span class="line">kp  = <span class="number">0.5</span>;</span><br><span class="line">ki   = <span class="number">0</span>;</span><br><span class="line">kd  = <span class="number">0</span>;</span><br><span class="line">miss = <span class="number">10</span>;    <span class="comment">% 每次输出减去固定的误差，以形成稳态误差</span></span><br><span class="line"></span><br><span class="line"><span class="comment">%% PID 算法</span></span><br><span class="line"><span class="comment">% 初始化</span></span><br><span class="line">u(<span class="number">1</span>) = start;</span><br><span class="line">error(<span class="number">2</span>) = target - u(<span class="number">1</span>);</span><br><span class="line">e_sum = e_sum + error(<span class="number">2</span>);</span><br><span class="line">de = error(<span class="number">2</span>)-error(<span class="number">1</span>);</span><br><span class="line">u(<span class="number">2</span>) = kp*error(<span class="number">2</span>)+ki*e_sum+kd*de + u(<span class="number">1</span>) - miss;</span><br><span class="line"><span class="comment">% PID 调节</span></span><br><span class="line"><span class="keyword">for</span> k = <span class="number">3</span>:<span class="number">1</span>:N</span><br><span class="line">    error(k) = target - u(k<span class="number">-1</span>);</span><br><span class="line">    e_sum = e_sum + error(k);</span><br><span class="line">    de = error(k)-error(k<span class="number">-1</span>);</span><br><span class="line">    u(k) = kp*error(k)+ki*e_sum+kd*de+u(k<span class="number">-1</span>) - miss;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">%% 绘图显示结果</span></span><br><span class="line"><span class="built_in">figure</span>;</span><br><span class="line"><span class="built_in">plot</span>(n, r, <span class="string">&#x27;-.&#x27;</span>);</span><br><span class="line"><span class="built_in">hold</span> on;</span><br><span class="line"><span class="built_in">plot</span>(n, u,<span class="string">&#x27;--&#x27;</span>);</span><br><span class="line"><span class="built_in">legend</span>(<span class="string">&quot;target&quot;</span>, <span class="string">&quot;present&quot;</span>);</span><br><span class="line">xlabel(<span class="string">&quot;离散时间 n&quot;</span>);</span><br><span class="line">ylabel(<span class="string">&quot;水位/cm&quot;</span>);</span><br><span class="line">ylim([<span class="number">0</span>,<span class="number">120</span>]);</span><br><span class="line">title(<span class="string">&quot;PID 水位控制&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>稳态误差在实际的工程中是十分常见的，例如控制马达转速，在运行时马达会受到摩擦力；控制温度时，由于热传导和热辐射会损失一部分热量……因此消除这个误差还是十分必要的。为了消除这个稳态误差，我们便引入了 <strong>积分控制</strong>。</p>
+<h3 id="积分控制integral-control"><a class="markdownIt-Anchor" href="#积分控制integral-control"></a> 积分控制（Integral-Control）</h3>
+<p>从比例控制的例子我们知道了当系统存在固定的误差 miss 时，我们还简单采用 P 控制则会形成稳态误差，无法达到我们的预设值。因此我们引入了积分控制 I：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>I</mi><mrow><mi>o</mi><mi>u</mi><mi>t</mi></mrow></msub><mo>=</mo><msub><mi>k</mi><mi>i</mi></msub><msubsup><mo>∫</mo><mn>0</mn><mi>t</mi></msubsup><mi>e</mi><mo stretchy="false">(</mo><mi>τ</mi><mo stretchy="false">)</mo><mi>d</mi><mi>τ</mi></mrow><annotation encoding="application/x-tex">I_{out}=k_{i}\int^{t}_{0}e(\tau)d{\tau}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.07847em;">I</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2805559999999999em;"><span style="top:-2.5500000000000003em;margin-left:-0.07847em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">o</span><span class="mord mathdefault mtight">u</span><span class="mord mathdefault mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.455406em;vertical-align:-0.9119499999999999em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.31166399999999994em;"><span style="top:-2.5500000000000003em;margin-left:-0.03148em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mop"><span class="mop op-symbol large-op" style="margin-right:0.44445em;position:relative;top:-0.0011249999999999316em;">∫</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.5434560000000002em;"><span style="top:-1.7880500000000001em;margin-left:-0.44445em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">0</span></span></span></span><span style="top:-3.8129000000000004em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.9119499999999999em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">e</span><span class="mopen">(</span><span class="mord mathdefault" style="margin-right:0.1132em;">τ</span><span class="mclose">)</span><span class="mord mathdefault">d</span><span class="mord"><span class="mord mathdefault" style="margin-right:0.1132em;">τ</span></span></span></span></span></span></p>
+<p>积分控制会把过去的误差也考虑进来，将过去一段时间的误差综合乘上一个系数 ki 得到一个平均误差，但由于系统在不断累积中会产生震荡，因此最后的结果一般都不会是平稳的收敛到预设值，而是在预设值附近震荡。继续使用上面的例子，我们加入积分控制系数 ki = 0.5：</p>
+<img src="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/PID_Matlab_3.jpg" alt="PID_Matlab_3" style="zoom:80%;" />
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">%% PID 参数</span></span><br><span class="line">kp  = <span class="number">0.5</span>;</span><br><span class="line">ki  = <span class="number">0.5</span>;</span><br><span class="line">kd  = <span class="number">0</span>;</span><br><span class="line">miss = <span class="number">10</span>;    <span class="comment">% 每次输出减去固定的误差，以形成稳态误差</span></span><br></pre></td></tr></table></figure>
+<p>从仿真的结果来看，我们可以很明显看到在加入积分控制后，虽然我们成功消除了稳态误差达到了预设值，但是我们的 PID 控制输出并不是平稳地收敛到预设值，而是产生了震荡，然后逐渐收敛到预设值。积分控制会加速系统趋近预设值的过程，并且消除稳态误差。积分增益越多、趋近预设值的速度越快，不过同样会因为累加而产生过冲的现象。</p>
+<p>不过有的时候，我们细心调教参数后还是可以近似平稳地收敛到预设值。但是大多数情况引入积分控制器都会是系统不稳定、震荡。为了解决积分器产生的震荡，我们引入微分控制来消抖。</p>
+<h3 id="微分控制derivative-control"><a class="markdownIt-Anchor" href="#微分控制derivative-control"></a> 微分控制（Derivative-Control）</h3>
+<p>微分控制不同于积分控制考虑过去的累加效果，考虑了将来的误差，对系统的输出做出快速反应。因此含有 kd 的 PID 也被称为可与则的控制器。kd 对减少控制器短期的改变很有帮助，能够达到消抖的功能。</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><msub><mi>D</mi><mrow><mi>o</mi><mi>u</mi><mi>t</mi></mrow></msub><mo>=</mo><msub><mi>k</mi><mi>d</mi></msub><mfrac><mi>d</mi><mrow><mi>d</mi><mi>t</mi></mrow></mfrac><mi>e</mi><mo stretchy="false">(</mo><mi>t</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">D_{out}=k_{d}\frac{d}{dt}e(t)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.83333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2805559999999999em;"><span style="top:-2.5500000000000003em;margin-left:-0.02778em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">o</span><span class="mord mathdefault mtight">u</span><span class="mord mathdefault mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:2.05744em;vertical-align:-0.686em;"></span><span class="mord"><span class="mord mathdefault" style="margin-right:0.03148em;">k</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.33610799999999996em;"><span style="top:-2.5500000000000003em;margin-left:-0.03148em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathdefault mtight">d</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.37144em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">d</span><span class="mord mathdefault">t</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathdefault">d</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord mathdefault">e</span><span class="mopen">(</span><span class="mord mathdefault">t</span><span class="mclose">)</span></span></span></span></span></p>
+<p>微分控制器可以提升稳定性，但也因微分系统不是因果系统，所以在 PID 实现的时候，需要加上一个低通滤波以限制高频噪声。（不过实际上大约只有 20% 的PID控制器用到了微分控制）</p>
+<p>下面我们在积分控制的基础上加一点微分控制 kd = 0.24，来看看效果如何：</p>
+<img src="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/PID_Matlab_4.jpg" alt="PID_Matlab_4" style="zoom:80%;" />
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">%% PID 参数</span></span><br><span class="line">kp  = <span class="number">0.5</span>;</span><br><span class="line">ki  = <span class="number">0.5</span>;</span><br><span class="line">kd  = <span class="number">0.24</span>;</span><br><span class="line">miss = <span class="number">10</span>;    <span class="comment">% 每次输出减去固定的误差，以形成稳态误差</span></span><br></pre></td></tr></table></figure>
+<p>我们可以看到幅度上有所削弱，由于之前的 kp 和 ki 没有调整好，所以效果可能不是很明显，但根据上图我们仍可以看出加入了微分控制后，整体上加快了稳定过程。（不过随着 kd 的变大，会产生尖刺，系统在收敛时也会有一段不大稳定的阶段。）</p>
+<h3 id="pid-参数调节"><a class="markdownIt-Anchor" href="#pid-参数调节"></a> PID 参数调节</h3>
+<p>虽然 PID 整体上不难，但是在实际应用中要找到一对合适的系数来优化实际系统还是比较难的。由于目前笔者还没有丰富的调参经验，就在网上查阅了相关资料，简单介绍一下调参的方式。</p>
+<ol>
+<li>
+<p>人工调参<br />
+最典型的做法是先将所有 k 均置零，调节 kp 直到回路起振，然后再将 kp 设置为 “1/4 振幅衰减”，然后增加 ki 直到一定时间后稳态误差被修正。最后根据情况调节 kd 或者 ki 和 kp 来使系统趋于稳定。<br />
+<img src="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/PID_Compensation_Animated.gif" alt="PID_Compensation_Animated" /></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">调整方式</th>
+<th style="text-align:center">上升时间</th>
+<th style="text-align:center">超调量</th>
+<th style="text-align:center">安定时间</th>
+<th style="text-align:center">稳态误差</th>
+<th style="text-align:center">稳定性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">P</td>
+<td style="text-align:center">减少</td>
+<td style="text-align:center">增加</td>
+<td style="text-align:center">小幅增加</td>
+<td style="text-align:center">减少</td>
+<td style="text-align:center">变差</td>
+</tr>
+<tr>
+<td style="text-align:center">PI</td>
+<td style="text-align:center">小幅减少</td>
+<td style="text-align:center">增加</td>
+<td style="text-align:center">增加</td>
+<td style="text-align:center">大幅减少</td>
+<td style="text-align:center">变差</td>
+</tr>
+<tr>
+<td style="text-align:center">PID</td>
+<td style="text-align:center">小幅减少</td>
+<td style="text-align:center">减少</td>
+<td style="text-align:center">减少</td>
+<td style="text-align:center">变动不大</td>
+<td style="text-align:center">变好</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
+<p>齐格勒·尼科尔斯方法<br />
+这是齐格勒·尼科尔斯在 1940 年导入的，一开始也是将 ki 与 kd 设置为 0，增加 kp 直到系统开始等幅震荡为止，此时增益称为 ku 时，而在振荡周期为 Pu，采用以下方式计算：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">控制器种类</th>
+<th style="text-align:center">kp</th>
+<th style="text-align:center">ki</th>
+<th style="text-align:center">kd</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">P</td>
+<td style="text-align:center">0.5ku</td>
+<td style="text-align:center">-</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">PI</td>
+<td style="text-align:center">0.45ku</td>
+<td style="text-align:center">1.2kp/Pu</td>
+<td style="text-align:center">-</td>
+</tr>
+<tr>
+<td style="text-align:center">PID</td>
+<td style="text-align:center">0.6ku</td>
+<td style="text-align:center">2kp/Pu</td>
+<td style="text-align:center">kpPu/8</td>
+</tr>
+</tbody>
+</table>
+</li>
+<li>
+<p>软件工具</p>
+<p>大部分现代的工业设备不再用上述人工计算的方式调试，而是用PID调试及最佳化软件来达到一致的效果。软件会收集资料，建立模型，并提供最佳的调试结果，有些软件甚至可以用参考命令的变化来进行调试。</p>
+<p>数学的PID调试会将脉冲加入系统，再用受控系统的频率响应来设计PID的参数。若是响应时间要数分钟的系统，建议用数学PID调试，因为用试误法可能要花上几天才能找到可让系统稳定的参数。最佳解不太容易找到，有些数位的回路控制器有自我调试的程序，利用微小的参考命令来计算最佳的调试值。</p>
+</li>
+</ol>
+<h3 id="pid-算法改进"><a class="markdownIt-Anchor" href="#pid-算法改进"></a> PID 算法改进</h3>
+<p>参考：</p>
+<p><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/PID%E6%8E%A7%E5%88%B6%E5%99%A8">PID控制器 - 维基百科，自由的百科全书 </a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/39573490">PID控制算法原理（抛弃公式，从本质上真正理解PID控制）</a></p>
+<hr />
+<p>(未完待续……)</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/Quark/tags/Algorithm/" rel="tag"># Algorithm</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/Quark/2021/08/15/STM32CubeIDE%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/" rel="prev" title="STM32CubeIDE 自制使用指南">
+      <i class="fa fa-chevron-left"></i> STM32CubeIDE 自制使用指南
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text"> 目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#pid-%E6%8E%A7%E5%88%B6%E7%AE%97%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text"> PID 控制算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#pid-%E7%AE%97%E6%B3%95%E4%BB%8B%E7%BB%8D"><span class="nav-number">2.1.</span> <span class="nav-text"> PID 算法介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%AF%94%E4%BE%8B%E6%8E%A7%E5%88%B6proportion-control"><span class="nav-number">2.2.</span> <span class="nav-text"> 比例控制（Proportion-Control）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A7%AF%E5%88%86%E6%8E%A7%E5%88%B6integral-control"><span class="nav-number">2.3.</span> <span class="nav-text"> 积分控制（Integral-Control）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BE%AE%E5%88%86%E6%8E%A7%E5%88%B6derivative-control"><span class="nav-number">2.4.</span> <span class="nav-text"> 微分控制（Derivative-Control）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pid-%E5%8F%82%E6%95%B0%E8%B0%83%E8%8A%82"><span class="nav-number">2.5.</span> <span class="nav-text"> PID 参数调节</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pid-%E7%AE%97%E6%B3%95%E6%94%B9%E8%BF%9B"><span class="nav-number">2.6.</span> <span class="nav-text"> PID 算法改进</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Chris"
+      src="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/img/0df431adcbef76096e34ebdc26dda3cc7cd99eb1-20210706060646187.jpeg">
+  <p class="site-author-name" itemprop="name">Chris</p>
+  <div class="site-description" itemprop="description">"I hope that I am a pioneer and my efforts can bring better technology and things to everyone."</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/Quark/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/Quark/categories/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/Quark/tags/">
+          
+        <span class="site-state-item-count">14</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/chrisz-nju" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;chrisz-nju" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/Quark/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 2020 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chris</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/Quark/lib/anime.min.js"></script>
+  <script src="/Quark/lib/velocity/velocity.min.js"></script>
+  <script src="/Quark/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/Quark/js/utils.js"></script>
+
+<script src="/Quark/js/motion.js"></script>
+
+
+<script src="/Quark/js/schemes/muse.js"></script>
+
+
+<script src="/Quark/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
