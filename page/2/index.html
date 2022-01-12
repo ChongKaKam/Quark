@@ -157,7 +157,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-Hans">
-    <link itemprop="mainEntityOfPage" href="https://chriszhuang.top/2021/01/12/CS144Lab0/">
+    <link itemprop="mainEntityOfPage" href="https://chriszhuang.top/2021/01/22/STM32%E5%8D%95%E7%89%87%E6%9C%BAHAL%E5%BA%93%E5%AD%A6%E4%B9%A0%EF%BC%88macOS%EF%BC%89%EF%BC%885%EF%BC%89%E2%80%94%E2%80%94/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="https://gitee.com/zhuang-jiaxin_gitee/pictures/raw/master/img/0df431adcbef76096e34ebdc26dda3cc7cd99eb1-20210706060646187.jpeg">
@@ -171,7 +171,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2021/01/12/CS144Lab0/" class="post-title-link" itemprop="url">CS144Lab0</a>
+            <a href="/2021/01/22/STM32%E5%8D%95%E7%89%87%E6%9C%BAHAL%E5%BA%93%E5%AD%A6%E4%B9%A0%EF%BC%88macOS%EF%BC%89%EF%BC%885%EF%BC%89%E2%80%94%E2%80%94/" class="post-title-link" itemprop="url">STM32之HAL库学习——电子时钟项目（1）</a>
         </h2>
 
         <div class="post-meta">
@@ -181,14 +181,14 @@
               </span>
               <span class="post-meta-item-text">Posted on</span>
 
-              <time title="Created: 2021-01-12 00:00:00" itemprop="dateCreated datePublished" datetime="2021-01-12T00:00:00+08:00">2021-01-12</time>
+              <time title="Created: 2021-01-22 00:00:00" itemprop="dateCreated datePublished" datetime="2021-01-22T00:00:00+08:00">2021-01-22</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">Edited on</span>
-                <time title="Modified: 2022-01-13 00:05:33" itemprop="dateModified" datetime="2022-01-13T00:05:33+08:00">2022-01-13</time>
+                <time title="Modified: 2021-07-07 21:48:34" itemprop="dateModified" datetime="2021-07-07T21:48:34+08:00">2021-07-07</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -196,7 +196,11 @@
               </span>
               <span class="post-meta-item-text">In</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+                  <a href="/categories/STM32%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">STM32学习</span></a>
+                </span>
+                  , 
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/STM32%E5%AD%A6%E4%B9%A0/My-STM32-Project/" itemprop="url" rel="index"><span itemprop="name">My STM32 Project</span></a>
                 </span>
             </span>
 
@@ -211,20 +215,17 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="目录"><a class="markdownIt-Anchor" href="#目录"></a> 目录</h2>
+          <p>——Jan.23.2021</p>
+<h2 id="目录"><a class="markdownIt-Anchor" href="#目录"></a> 目录</h2>
+<p>本次项目采用正点原子STM32F407探索者开发版和STM32cubeIDE软件开发</p>
 <ul>
-<li>CS144 实验介绍</li>
-<li>Lab0: networking warmup
-<ul>
-<li>配置实验环境</li>
-<li>利用一些网络工具</li>
-<li>完成 webget</li>
-</ul>
-</li>
+<li>STM32的RTC时钟功能简单介绍</li>
+<li>电子时钟项目计划</li>
+<li>开发过程、遇到的问题和解决方案</li>
 </ul>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2021/01/12/CS144Lab0/#more" rel="contents">
+              <a class="btn" href="/2021/01/22/STM32%E5%8D%95%E7%89%87%E6%9C%BAHAL%E5%BA%93%E5%AD%A6%E4%B9%A0%EF%BC%88macOS%EF%BC%89%EF%BC%885%EF%BC%89%E2%80%94%E2%80%94/#more" rel="contents">
                 Read more &raquo;
               </a>
             </div>
